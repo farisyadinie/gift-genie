@@ -1,0 +1,758 @@
+{% extends "base.html" %}
+
+{% block title %}
+Saved Gifts - Gift Genie
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+
+    /* =====================================================
+       SAVED GIFTS PAGE
+       ===================================================== */
+
+    .saved-gifts-page {
+        width: 100%;
+    }
+
+
+    /* =====================================================
+       SAVED GIFT CARDS
+       ===================================================== */
+
+    .saved-gifts-page .recipient-card {
+        position: relative;
+
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 14px;
+
+        min-height: 145px;
+    }
+
+
+    .saved-gifts-page .recipient-info {
+        flex: 1;
+
+        min-width: 0;
+
+        padding-right: 5px;
+
+        padding-bottom: 32px;
+    }
+
+
+    .saved-gifts-page .recipient-info h3 {
+        margin-bottom: 6px;
+
+        line-height: 1.2;
+    }
+
+
+    .saved-gifts-page .recipient-info p {
+        margin-bottom: 8px;
+
+        line-height: 1.35;
+    }
+
+
+    .saved-gifts-page .recipient-info span {
+        display: block;
+
+        margin-top: 5px;
+    }
+
+
+    /* =====================================================
+       RECIPIENT NAME
+       ===================================================== */
+
+    .saved-recipient-name {
+        font-size: 11px;
+
+        font-weight: 700;
+
+        color: #777084;
+
+        line-height: 1.3;
+
+        margin-top: 7px;
+    }
+
+
+    /* =====================================================
+       REMOVE BUTTON
+       ===================================================== */
+
+    .saved-gifts-page .recipient-actions {
+        position: absolute;
+
+        right: 18px;
+
+        bottom: 18px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: flex-end;
+
+        gap: 10px;
+
+        white-space: nowrap;
+    }
+
+
+    .saved-gifts-page .remove-gift-trigger {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        background: none;
+
+        border: none;
+
+        padding: 0;
+
+        margin: 0;
+
+        font-family: inherit;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        color: #c93562;
+
+        cursor: pointer;
+
+        line-height: 1;
+
+        appearance: none;
+
+        -webkit-appearance: none;
+    }
+
+
+    .saved-gifts-page .remove-gift-trigger:hover {
+        text-decoration: underline;
+    }
+
+
+    /* =====================================================
+       REMOVE CONFIRMATION MODAL
+       ===================================================== */
+
+    .remove-modal-overlay {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        background: rgba(34, 24, 52, 0.28);
+
+        display: none;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 20px;
+
+        z-index: 5000;
+    }
+
+
+    .remove-modal-overlay.show {
+        display: flex;
+    }
+
+
+    .remove-modal {
+        width: 100%;
+
+        max-width: 370px;
+
+        background: #ffffff;
+
+        border-radius: 18px;
+
+        padding: 25px 23px 22px;
+
+        text-align: center;
+
+        border: 1px solid #eee9f8;
+
+        box-shadow:
+            0 18px 45px rgba(62, 38, 100, 0.18);
+
+        animation: removeModalAppear 0.2s ease;
+    }
+
+
+    @keyframes removeModalAppear {
+
+        from {
+            opacity: 0;
+
+            transform: translateY(8px) scale(0.97);
+        }
+
+        to {
+            opacity: 1;
+
+            transform: translateY(0) scale(1);
+        }
+
+    }
+
+
+    /* =====================================================
+       MODAL ICON
+       ===================================================== */
+
+    .remove-modal-icon {
+        width: 55px;
+
+        height: 55px;
+
+        margin: 0 auto 14px;
+
+        border-radius: 16px;
+
+        background: #fde8ed;
+
+        color: #c93562;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 24px;
+    }
+
+
+    /* =====================================================
+       MODAL TEXT
+       ===================================================== */
+
+    .remove-modal h2 {
+        font-size: 19px;
+
+        color: #171326;
+
+        margin-bottom: 7px;
+    }
+
+
+    .remove-modal p {
+        font-size: 12px;
+
+        color: #777084;
+
+        line-height: 1.5;
+
+        margin-bottom: 20px;
+    }
+
+
+    /* =====================================================
+       MODAL BUTTONS
+       ===================================================== */
+
+    .remove-modal-actions {
+        display: flex;
+
+        gap: 10px;
+    }
+
+
+    .remove-cancel-button,
+    .remove-confirm-button {
+        flex: 1;
+
+        min-height: 42px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        font-family: inherit;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition: 0.2s ease;
+
+        appearance: none;
+
+        -webkit-appearance: none;
+    }
+
+
+    .remove-cancel-button {
+        background: #f1edf8;
+
+        color: #5f586b;
+    }
+
+
+    .remove-cancel-button:hover {
+        background: #e6dfef;
+    }
+
+
+    .remove-confirm-button {
+        background: #e83d68;
+
+        color: #ffffff;
+    }
+
+
+    .remove-confirm-button:hover {
+        background: #d92f5b;
+
+        transform: translateY(-1px);
+    }
+
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 900px) {
+
+        .saved-gifts-page .recipient-card {
+            min-height: 160px;
+        }
+
+
+        .saved-gifts-page .recipient-actions {
+            right: 16px;
+
+            bottom: 16px;
+        }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+        .remove-modal {
+            max-width: 330px;
+
+            padding: 22px 19px 19px;
+        }
+
+    }
+
+</style>
+
+
+<div class="recipients-page saved-gifts-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Saved Gifts
+            </h1>
+
+            <p>
+                Keep your favourite gift ideas in one place.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SAVED GIFTS
+         ===================================================== -->
+
+    {% if saved_gifts %}
+
+        <div class="recipient-grid">
+
+            {% for gift in saved_gifts %}
+
+                <div class="recipient-card">
+
+
+                    <!-- GIFT ICON -->
+
+                    <div class="recipient-avatar">
+                        🎁
+                    </div>
+
+
+                    <!-- GIFT INFORMATION -->
+
+                    <div class="recipient-info">
+
+                        <h3>
+                            {{ gift["name"] }}
+                        </h3>
+
+
+                        {% if gift["description"] %}
+
+                            <p>
+                                {{ gift["description"] }}
+                            </p>
+
+                        {% endif %}
+
+
+                        <span>
+
+                            RM{{ "%.0f"|format(gift["min_price"]) }}
+
+                            -
+
+                            RM{{ "%.0f"|format(gift["max_price"]) }}
+
+                        </span>
+
+
+                        {% if gift["recipient_name"] %}
+
+                            <div class="saved-recipient-name">
+
+                                For {{ gift["recipient_name"] }}
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- REMOVE -->
+
+                    <div class="recipient-actions">
+
+                        <button
+                            type="button"
+                            class="remove-gift-trigger"
+                            data-saved-id="{{ gift['saved_id'] }}"
+                            data-gift-name="{{ gift['name'] }}"
+                        >
+                            Remove
+                        </button>
+
+                    </div>
+
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+        <!-- EMPTY STATE -->
+
+        <div class="recipients-empty">
+
+            <div class="empty-recipient-icon">
+                ♡
+            </div>
+
+
+            <h2>
+                No saved gifts yet
+            </h2>
+
+
+            <p>
+                Save your favourite gift ideas and they will appear here.
+            </p>
+
+
+            <a
+                href="{{ url_for('gift_ideas') }}"
+                class="primary-button"
+            >
+                Find Gift Ideas
+            </a>
+
+        </div>
+
+    {% endif %}
+
+
+</div>
+
+
+
+<!-- =========================================================
+     REMOVE SAVED GIFT MODAL
+     ========================================================= -->
+
+<div
+    class="remove-modal-overlay"
+    id="removeModalOverlay"
+>
+
+    <div
+        class="remove-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="removeModalTitle"
+    >
+
+        <div class="remove-modal-icon">
+            🗑️
+        </div>
+
+
+        <h2 id="removeModalTitle">
+            Remove Saved Gift?
+        </h2>
+
+
+        <p id="removeModalMessage">
+            Are you sure you want to remove this saved gift?
+        </p>
+
+
+        <div class="remove-modal-actions">
+
+            <button
+                type="button"
+                class="remove-cancel-button"
+                id="removeCancelButton"
+            >
+                Cancel
+            </button>
+
+
+            <button
+                type="button"
+                class="remove-confirm-button"
+                id="removeConfirmButton"
+            >
+                Remove
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    /* =====================================================
+       REMOVE MODAL ELEMENTS
+       ===================================================== */
+
+    const removeModalOverlay =
+        document.getElementById(
+            "removeModalOverlay"
+        );
+
+
+    const removeModalMessage =
+        document.getElementById(
+            "removeModalMessage"
+        );
+
+
+    const removeCancelButton =
+        document.getElementById(
+            "removeCancelButton"
+        );
+
+
+    const removeConfirmButton =
+        document.getElementById(
+            "removeConfirmButton"
+        );
+
+
+    const removeTriggers =
+        document.querySelectorAll(
+            ".remove-gift-trigger"
+        );
+
+
+    let selectedSavedId = null;
+
+
+
+    /* =====================================================
+       OPEN MODAL
+       ===================================================== */
+
+    removeTriggers.forEach(
+        function (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    selectedSavedId =
+                        button.dataset.savedId;
+
+
+                    const giftName =
+                        button.dataset.giftName;
+
+
+                    removeModalMessage.textContent =
+                        `Are you sure you want to remove "${giftName}" from your saved gifts?`;
+
+
+                    removeModalOverlay.classList.add(
+                        "show"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+
+    /* =====================================================
+       CLOSE MODAL
+       ===================================================== */
+
+    function closeRemoveModal() {
+
+        removeModalOverlay.classList.remove(
+            "show"
+        );
+
+
+        selectedSavedId = null;
+
+    }
+
+
+
+    /* =====================================================
+       CANCEL
+       ===================================================== */
+
+    if (removeCancelButton) {
+
+        removeCancelButton.addEventListener(
+            "click",
+            function () {
+
+                closeRemoveModal();
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CONFIRM REMOVE
+       ===================================================== */
+
+    if (removeConfirmButton) {
+
+        removeConfirmButton.addEventListener(
+            "click",
+            function () {
+
+                if (!selectedSavedId) {
+
+                    return;
+
+                }
+
+
+                window.location.href =
+                    `/saved-gifts/delete/${selectedSavedId}`;
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CLICK OUTSIDE
+       ===================================================== */
+
+    if (removeModalOverlay) {
+
+        removeModalOverlay.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target ===
+                    removeModalOverlay
+                ) {
+
+                    closeRemoveModal();
+
+                }
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       ESCAPE KEY
+       ===================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape" &&
+                removeModalOverlay.classList.contains(
+                    "show"
+                )
+            ) {
+
+                closeRemoveModal();
+
+            }
+
+        }
+    );
+
+</script>
+
+
+{% endblock %}

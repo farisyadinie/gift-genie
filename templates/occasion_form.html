@@ -1,0 +1,714 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+    {{ title if title else "Add Occasion" }} - Gift Genie
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<style>
+
+    /* =====================================================
+       CUSTOM OCCASION INPUT
+       ===================================================== */
+
+    .custom-occasion-group {
+        display: none;
+    }
+
+
+    .custom-occasion-group.show {
+        display: flex;
+    }
+
+
+    .custom-occasion-hint {
+        font-size: 10px;
+
+        color: #81798c;
+
+        margin-top: 1px;
+    }
+
+</style>
+
+
+<div class="recipients-page">
+
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+
+                {{ title if title else "Add Occasion" }}
+
+            </h1>
+
+
+            <p>
+
+                Keep track of an important date.
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         CHECK FOR RECIPIENTS
+         ===================================================== -->
+
+    {% if recipients %}
+
+
+
+        <!-- =================================================
+             OCCASION FORM
+             ================================================= -->
+
+        <div class="content-card">
+
+            <form
+                method="POST"
+                id="occasionForm"
+            >
+
+
+
+                <!-- =========================================
+                     RECIPIENT
+                     ========================================= -->
+
+                <div class="form-group">
+
+                    <label for="recipient_id">
+
+                        Recipient
+
+                    </label>
+
+
+                    <select
+                        id="recipient_id"
+                        name="recipient_id"
+                        required
+                    >
+
+                        <option value="">
+
+                            Select recipient
+
+                        </option>
+
+
+                        {% for recipient in recipients %}
+
+                            <option
+                                value="{{ recipient['id'] }}"
+
+                                {% if occasion
+                                      and occasion['recipient_id'] == recipient['id'] %}
+
+                                    selected
+
+                                {% endif %}
+                            >
+
+                                {{ recipient["name"] }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     OCCASION
+                     ========================================= -->
+
+                <div class="form-group">
+
+                    <label for="occasion_select">
+
+                        Occasion
+
+                    </label>
+
+
+                    {% set current =
+
+                        occasion["occasion"]
+
+                        if occasion
+
+                        else ""
+
+                    %}
+
+
+                    <!-- Hidden field sent to Flask -->
+
+                    <input
+                        type="hidden"
+                        id="occasion"
+                        name="occasion"
+                        value="{{ current }}"
+                    >
+
+
+                    <!-- Occasion dropdown -->
+
+                    <select
+                        id="occasion_select"
+                        required
+                    >
+
+                        <option
+                            value=""
+                            disabled
+
+                            {% if not current %}
+                                selected
+                            {% endif %}
+                        >
+
+                            Select occasion
+
+                        </option>
+
+
+                        <option
+                            value="Birthday"
+
+                            {% if current == "Birthday" %}
+                                selected
+                            {% endif %}
+                        >
+
+                            Birthday
+
+                        </option>
+
+
+                        <option
+                            value="Graduation"
+
+                            {% if current == "Graduation" %}
+                                selected
+                            {% endif %}
+                        >
+
+                            Graduation
+
+                        </option>
+
+
+                        <option
+                            value="Anniversary"
+
+                            {% if current == "Anniversary" %}
+                                selected
+                            {% endif %}
+                        >
+
+                            Anniversary
+
+                        </option>
+
+
+                        <option
+                            value="Wedding"
+
+                            {% if current == "Wedding" %}
+                                selected
+                            {% endif %}
+                        >
+
+                            Wedding
+
+                        </option>
+
+
+                        <option
+                            value="Housewarming"
+
+                            {% if current == "Housewarming" %}
+                                selected
+                            {% endif %}
+                        >
+
+                            Housewarming
+
+                        </option>
+
+
+                        <option
+                            value="Thank You"
+
+                            {% if current == "Thank You" %}
+                                selected
+                            {% endif %}
+                        >
+
+                            Thank You
+
+                        </option>
+
+
+                        <option
+                            value="Other"
+
+                            {% if current
+                                  and current not in [
+                                      "Birthday",
+                                      "Graduation",
+                                      "Anniversary",
+                                      "Wedding",
+                                      "Housewarming",
+                                      "Thank You"
+                                  ] %}
+                                selected
+                            {% endif %}
+                        >
+
+                            Other
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     CUSTOM OCCASION
+                     ========================================= -->
+
+                <div
+                    class="form-group custom-occasion-group"
+                    id="customOccasionGroup"
+                >
+
+                    <label for="custom_occasion">
+
+                        Custom Occasion
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="custom_occasion"
+                        placeholder="Enter your occasion"
+                        maxlength="100"
+
+                        {% if current
+                              and current not in [
+                                  "Birthday",
+                                  "Graduation",
+                                  "Anniversary",
+                                  "Wedding",
+                                  "Housewarming",
+                                  "Thank You"
+                              ] %}
+
+                            value="{{ current }}"
+
+                        {% endif %}
+                    >
+
+
+                    <div class="custom-occasion-hint">
+
+                        Enter any occasion that is not listed above.
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     DATE
+                     ========================================= -->
+
+                <div class="form-group">
+
+                    <label for="date">
+
+                        Date
+
+                    </label>
+
+
+                    <input
+                        type="date"
+                        id="date"
+                        name="date"
+
+                        value="{% if occasion %}{{ occasion['date'] }}{% endif %}"
+
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- =========================================
+                     FORM ACTIONS
+                     ========================================= -->
+
+                <div class="form-actions">
+
+
+                    <a
+                        href="{{ url_for('occasions') }}"
+                        class="secondary-button"
+                    >
+
+                        Cancel
+
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
+
+                        Save Occasion
+
+                    </button>
+
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+
+
+    {% else %}
+
+
+
+        <!-- =================================================
+             NO RECIPIENTS
+             ================================================= -->
+
+        <div class="recipients-empty">
+
+
+            <div class="empty-recipient-icon">
+
+                👤
+
+            </div>
+
+
+            <h2>
+
+                Add a recipient first
+
+            </h2>
+
+
+            <p>
+
+                You need at least one recipient before adding an occasion.
+
+            </p>
+
+
+            <a
+                href="{{ url_for('recipient_form') }}"
+                class="primary-button"
+            >
+
+                + Add Recipient
+
+            </a>
+
+
+        </div>
+
+
+
+    {% endif %}
+
+
+
+</div>
+
+
+
+<script>
+
+    /* =====================================================
+       CUSTOM OCCASION HANDLING
+       ===================================================== */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+
+            const occasionForm =
+                document.getElementById(
+                    "occasionForm"
+                );
+
+
+            const occasionSelect =
+                document.getElementById(
+                    "occasion_select"
+                );
+
+
+            const occasionInput =
+                document.getElementById(
+                    "occasion"
+                );
+
+
+            const customOccasionGroup =
+                document.getElementById(
+                    "customOccasionGroup"
+                );
+
+
+            const customOccasion =
+                document.getElementById(
+                    "custom_occasion"
+                );
+
+
+            if (
+                !occasionForm ||
+                !occasionSelect ||
+                !occasionInput ||
+                !customOccasionGroup ||
+                !customOccasion
+            ) {
+
+                return;
+
+            }
+
+
+
+            /* =================================================
+               SHOW / HIDE CUSTOM INPUT
+               ================================================= */
+
+            function updateOccasionField() {
+
+
+                if (
+                    occasionSelect.value === "Other"
+                ) {
+
+                    customOccasionGroup.classList.add(
+                        "show"
+                    );
+
+
+                    customOccasion.required = true;
+
+
+                    customOccasion.focus();
+
+
+                }
+
+                else {
+
+                    customOccasionGroup.classList.remove(
+                        "show"
+                    );
+
+
+                    customOccasion.required = false;
+
+
+                    customOccasion.value = "";
+
+
+                    occasionInput.value =
+                        occasionSelect.value;
+
+                }
+
+            }
+
+
+
+            /* =================================================
+               OCCASION DROPDOWN CHANGE
+               ================================================= */
+
+            occasionSelect.addEventListener(
+                "change",
+                function () {
+
+
+                    if (
+                        occasionSelect.value === "Other"
+                    ) {
+
+
+                        customOccasionGroup.classList.add(
+                            "show"
+                        );
+
+
+                        customOccasion.required = true;
+
+
+                        /*
+                        Keep existing custom value
+                        when editing.
+                        */
+
+                        if (
+                            customOccasion.value.trim() === ""
+                        ) {
+
+                            customOccasion.focus();
+
+                        }
+
+                    }
+
+                    else {
+
+
+                        customOccasionGroup.classList.remove(
+                            "show"
+                        );
+
+
+                        customOccasion.required = false;
+
+
+                        customOccasion.value = "";
+
+
+                        occasionInput.value =
+                            occasionSelect.value;
+
+                    }
+
+                }
+            );
+
+
+
+            /* =================================================
+               CUSTOM OCCASION TEXT
+               ================================================= */
+
+            customOccasion.addEventListener(
+                "input",
+                function () {
+
+
+                    if (
+                        occasionSelect.value === "Other"
+                    ) {
+
+                        occasionInput.value =
+                            customOccasion.value.trim();
+
+                    }
+
+                }
+            );
+
+
+
+            /* =================================================
+               FORM SUBMISSION
+               ================================================= */
+
+            occasionForm.addEventListener(
+                "submit",
+                function (event) {
+
+
+                    if (
+                        occasionSelect.value === "Other"
+                    ) {
+
+
+                        const customValue =
+                            customOccasion.value.trim();
+
+
+                        if (!customValue) {
+
+                            event.preventDefault();
+
+
+                            customOccasion.focus();
+
+
+                            return;
+
+                        }
+
+
+                        occasionInput.value =
+                            customValue;
+
+                    }
+
+                    else {
+
+
+                        occasionInput.value =
+                            occasionSelect.value;
+
+                    }
+
+                }
+            );
+
+
+
+            /* =================================================
+               INITIAL PAGE STATE
+               ================================================= */
+
+            updateOccasionField();
+
+
+        }
+    );
+
+</script>
+
+
+{% endblock %}

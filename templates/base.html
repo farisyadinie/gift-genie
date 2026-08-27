@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+        Gift Genie
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <!-- =====================================================
+         PROFILE DROPDOWN STYLE
+         ===================================================== -->
+
+    <style>
+
+        .profile-menu-wrapper {
+            position: relative;
+        }
+
+
+        .profile-toggle {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            border: none;
+
+            background: transparent;
+
+            padding: 3px 6px;
+
+            border-radius: 12px;
+
+            cursor: pointer;
+
+            font-family: inherit;
+
+            color: inherit;
+
+            transition: 0.2s ease;
+        }
+
+
+        .profile-toggle:hover {
+            background: #f0e8fb;
+        }
+
+
+        .profile-dropdown {
+            position: absolute;
+
+            top: 52px;
+
+            right: 0;
+
+            width: 190px;
+
+            background: #ffffff;
+
+            border: 1px solid #eee9f8;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 12px 30px rgba(62, 38, 100, 0.12);
+
+            overflow: hidden;
+
+            display: none;
+
+            z-index: 1000;
+        }
+
+
+        .profile-dropdown.show {
+            display: block;
+        }
+
+
+        .profile-dropdown-header {
+            padding: 13px 14px;
+
+            border-bottom: 1px solid #eee9f8;
+
+            background: #faf8ff;
+        }
+
+
+        .profile-dropdown-header strong {
+            display: block;
+
+            font-size: 12px;
+
+            color: #211b2f;
+
+            margin-bottom: 3px;
+        }
+
+
+        .profile-dropdown-header span {
+            display: block;
+
+            font-size: 10px;
+
+            color: #81798c;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+        }
+
+
+        .profile-dropdown-item {
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            width: 100%;
+
+            padding: 11px 14px;
+
+            background: #ffffff;
+
+            color: #302a3c;
+
+            text-decoration: none;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            transition: 0.2s ease;
+        }
+
+
+        .profile-dropdown-item:hover {
+            background: #faf7ff;
+        }
+
+
+        .profile-dropdown-item.logout {
+            color: #c93562;
+
+            border-top: 1px solid #f1edf7;
+        }
+
+
+        .profile-dropdown-icon {
+            width: 24px;
+
+            height: 24px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 7px;
+
+            background: #eadcff;
+
+            font-size: 13px;
+
+            flex-shrink: 0;
+        }
+
+
+        .profile-dropdown-item.logout .profile-dropdown-icon {
+            background: #fbe4ed;
+        }
+
+
+        @media (max-width: 650px) {
+
+            .profile-dropdown {
+                right: 0;
+
+                width: 175px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- =================================================
+             LOGO
+             ================================================= -->
+
+        <div class="sidebar-logo">
+
+            <div class="logo-box">
+                🎁
+            </div>
+
+            <div class="logo-text">
+                Gift Genie
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             NAVIGATION
+             ================================================= -->
+
+        <nav class="sidebar-nav">
+
+
+            <!-- DASHBOARD -->
+
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    ▦
+                </span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+
+            <!-- RECIPIENTS -->
+
+            <a
+                href="{{ url_for('recipients') }}"
+                class="nav-item {% if request.endpoint in ['recipients', 'recipient_form', 'edit_recipient'] %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    👥
+                </span>
+
+                <span>
+                    Recipients
+                </span>
+
+            </a>
+
+
+
+            <!-- GIFT IDEAS -->
+
+            <a
+                href="{{ url_for('gift_ideas') }}"
+                class="nav-item {% if request.endpoint in ['gift_ideas', 'edit_gift'] %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🎁
+                </span>
+
+                <span>
+                    Gift Ideas
+                </span>
+
+            </a>
+
+
+
+            <!-- OCCASIONS -->
+
+            <a
+                href="{{ url_for('occasions') }}"
+                class="nav-item {% if request.endpoint in ['occasions', 'occasion_form', 'edit_occasion'] %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    📅
+                </span>
+
+                <span>
+                    Occasions
+                </span>
+
+            </a>
+
+
+
+            <!-- SAVED GIFTS -->
+
+            <a
+                href="{{ url_for('saved_gifts') }}"
+                class="nav-item {% if request.endpoint == 'saved_gifts' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    ❤️
+                </span>
+
+                <span>
+                    Saved Gifts
+                </span>
+
+            </a>
+
+
+
+            <!-- PROFILE -->
+
+            <a
+                href="{{ url_for('profile') }}"
+                class="nav-item {% if request.endpoint == 'profile' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    👤
+                </span>
+
+                <span>
+                    Profile
+                </span>
+
+            </a>
+
+
+
+            <!-- SETTINGS -->
+
+            <a
+                href="{{ url_for('settings') }}"
+                class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    ⚙️
+                </span>
+
+                <span>
+                    Settings
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+
+        <!-- =================================================
+             GIFT IDEA BOX
+             ================================================= -->
+
+        <div class="sidebar-bottom">
+
+            <div class="idea-box">
+
+                <div class="idea-stars">
+                    ✨
+                </div>
+
+                <h3>
+                    Need gift ideas?
+                </h3>
+
+                <p>
+                    Let Gift Genie help you find the perfect gift!
+                </p>
+
+                <a
+                    href="{{ url_for('gift_ideas') }}"
+                    class="idea-button"
+                >
+                    Generate Gift Ideas ✨
+                </a>
+
+            </div>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN AREA
+         ===================================================== -->
+
+    <main class="main-area">
+
+
+        <!-- =================================================
+             TOP BAR
+             ================================================= -->
+
+        <header class="topbar">
+
+            <div></div>
+
+
+            <div class="topbar-right">
+
+
+                <!-- =========================================
+                     NOTIFICATION
+                     ========================================= -->
+
+                <div class="notification-wrapper">
+
+
+                    <button
+                        class="notification-button"
+                        type="button"
+                        id="notificationButton"
+                    >
+
+                        🔔
+
+                        <span
+                            class="notification-badge"
+                            id="notificationBadge"
+                        >
+                        </span>
+
+                    </button>
+
+
+                    <!-- NOTIFICATION DROPDOWN -->
+
+                    <div
+                        class="notification-dropdown"
+                        id="notificationDropdown"
+                    >
+
+                        <div class="notification-header">
+
+                            <strong>
+                                Notifications
+                            </strong>
+
+                        </div>
+
+
+                        <div
+                            class="notification-list"
+                            id="notificationList"
+                        >
+
+                            <div class="notification-loading">
+                                Loading...
+                            </div>
+
+                        </div>
+
+
+                        <a
+                            href="{{ url_for('occasions') }}"
+                            class="notification-footer"
+                        >
+                            View all occasions →
+                        </a>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     PROFILE DROPDOWN
+                     ========================================= -->
+
+                {% if session.get("user_id") %}
+
+                    <div class="profile-menu-wrapper">
+
+                        <button
+                            type="button"
+                            class="profile-toggle"
+                            id="profileToggle"
+                        >
+
+                            <div class="profile-circle">
+                                👤
+                            </div>
+
+
+                            <span class="profile-name">
+
+                                Hello,
+                                {{ session.get("user_name", "User") }}!
+
+                            </span>
+
+
+                            <span class="profile-arrow">
+                                ▾
+                            </span>
+
+                        </button>
+
+
+                        <!-- PROFILE DROPDOWN -->
+
+                        <div
+                            class="profile-dropdown"
+                            id="profileDropdown"
+                        >
+
+                            <div class="profile-dropdown-header">
+
+                                <strong>
+                                    {{ session.get("user_name", "User") }}
+                                </strong>
+
+                                <span>
+                                    {{ session.get("email", "") }}
+                                </span>
+
+                            </div>
+
+
+                            <!-- PROFILE -->
+
+                            <a
+                                href="{{ url_for('profile') }}"
+                                class="profile-dropdown-item"
+                            >
+
+                                <span class="profile-dropdown-icon">
+                                    👤
+                                </span>
+
+                                <span>
+                                    Profile
+                                </span>
+
+                            </a>
+
+
+                            <!-- LOGOUT -->
+
+                            <a
+                                href="{{ url_for('logout') }}"
+                                class="profile-dropdown-item logout"
+                            >
+
+                                <span class="profile-dropdown-icon">
+                                    🚪
+                                </span>
+
+                                <span>
+                                    Logout
+                                </span>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                {% else %}
+
+                    <a
+                        href="{{ url_for('login') }}"
+                        class="profile-link"
+                    >
+
+                        <div class="profile-circle">
+                            👤
+                        </div>
+
+
+                        <span class="profile-name">
+                            Login
+                        </span>
+
+
+                    </a>
+
+                {% endif %}
+
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             FLASH MESSAGES
+             ================================================= -->
+
+        {% with messages = get_flashed_messages(
+            with_categories=true
+        ) %}
+
+            {% if messages %}
+
+                <div class="flash-container">
+
+                    {% for category, message in messages %}
+
+                        <div
+                            class="flash-message {{ category }}"
+                        >
+
+                            {{ message }}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+
+        <!-- =================================================
+             PAGE CONTENT
+             ================================================= -->
+
+        <div class="page-content">
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+
+/* =========================================================
+   NOTIFICATION ELEMENTS
+   ========================================================= */
+
+const notificationButton =
+    document.getElementById("notificationButton");
+
+const notificationDropdown =
+    document.getElementById("notificationDropdown");
+
+const notificationList =
+    document.getElementById("notificationList");
+
+const notificationBadge =
+    document.getElementById("notificationBadge");
+
+
+
+/* =========================================================
+   NOTIFICATION DROPDOWN
+   ========================================================= */
+
+if (
+    notificationButton &&
+    notificationDropdown
+) {
+
+    notificationButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+            notificationDropdown.classList.toggle(
+                "show"
+            );
+
+            loadNotifications();
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   LOAD NOTIFICATIONS
+   ========================================================= */
+
+async function loadNotifications() {
+
+    if (
+        !notificationList ||
+        !notificationBadge
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch("/notifications");
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to load notifications."
+            );
+
+        }
+
+
+        const notifications =
+            await response.json();
+
+
+        notificationList.innerHTML = "";
+
+
+        /* =================================================
+           NO NOTIFICATIONS
+           ================================================= */
+
+        if (notifications.length === 0) {
+
+            notificationList.innerHTML = `
+
+                <div class="notification-empty">
+
+                    🔔
+
+                    <p>
+                        No upcoming occasions.
+                    </p>
+
+                </div>
+
+            `;
+
+
+            notificationBadge.style.display =
+                "none";
+
+
+            return;
+
+        }
+
+
+
+        /* =================================================
+           SHOW BADGE
+           ================================================= */
+
+        notificationBadge.textContent =
+            notifications.length;
+
+        notificationBadge.style.display =
+            "flex";
+
+
+
+        /* =================================================
+           DISPLAY NOTIFICATIONS
+           ================================================= */
+
+        notifications.forEach(
+            function (notification) {
+
+                const item =
+                    document.createElement("div");
+
+                item.className =
+                    "notification-item";
+
+
+                let message = "";
+
+
+                if (notification.days === 0) {
+
+                    message =
+                        `${notification.name}'s ${notification.occasion} is today!`;
+
+                }
+
+                else if (notification.days === 1) {
+
+                    message =
+                        `${notification.name}'s ${notification.occasion} is tomorrow!`;
+
+                }
+
+                else {
+
+                    message =
+                        `${notification.name}'s ${notification.occasion} is in ${notification.days} days.`;
+
+                }
+
+
+                item.innerHTML = `
+
+                    <div class="notification-icon">
+                        📅
+                    </div>
+
+                    <div class="notification-content">
+
+                        <strong>
+                            ${message}
+                        </strong>
+
+                        <span>
+                            ${notification.date}
+                        </span>
+
+                    </div>
+
+                `;
+
+
+                notificationList.appendChild(
+                    item
+                );
+
+            }
+        );
+
+    }
+
+
+    catch (error) {
+
+        notificationList.innerHTML = `
+
+            <div class="notification-empty">
+
+                <p>
+                    Unable to load notifications.
+                </p>
+
+            </div>
+
+        `;
+
+        notificationBadge.style.display =
+            "none";
+
+    }
+
+}
+
+
+
+/* =========================================================
+   PROFILE DROPDOWN
+   ========================================================= */
+
+const profileToggle =
+    document.getElementById("profileToggle");
+
+const profileDropdown =
+    document.getElementById("profileDropdown");
+
+
+
+if (
+    profileToggle &&
+    profileDropdown
+) {
+
+    profileToggle.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+            profileDropdown.classList.toggle(
+                "show"
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   CLOSE DROPDOWNS WHEN CLICKING OUTSIDE
+   ========================================================= */
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+
+        /* Close notification */
+
+        if (
+            !event.target.closest(
+                ".notification-wrapper"
+            )
+        ) {
+
+            if (notificationDropdown) {
+
+                notificationDropdown.classList.remove(
+                    "show"
+                );
+
+            }
+
+        }
+
+
+
+        /* Close profile */
+
+        if (
+            !event.target.closest(
+                ".profile-menu-wrapper"
+            )
+        ) {
+
+            if (profileDropdown) {
+
+                profileDropdown.classList.remove(
+                    "show"
+                );
+
+            }
+
+        }
+
+    }
+);
+
+
+</script>
+
+
+</body>
+
+</html>

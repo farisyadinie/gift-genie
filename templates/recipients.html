@@ -1,0 +1,733 @@
+{% extends "base.html" %}
+
+{% block title %}
+Recipients - Gift Genie
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+
+    /* =====================================================
+       RECIPIENT PAGE
+       ===================================================== */
+
+    .recipients-page {
+        width: 100%;
+    }
+
+
+    /* =====================================================
+       RECIPIENT ACTION BUTTONS
+       ===================================================== */
+
+    .recipients-page .recipient-actions {
+        margin-left: auto;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: flex-end;
+
+        gap: 10px;
+
+        flex-wrap: nowrap;
+    }
+
+
+    .recipients-page .recipient-actions .edit-button {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        color: #713ddd;
+
+        text-decoration: none;
+
+        font-family: inherit;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        line-height: 1;
+
+        white-space: nowrap;
+
+        background: none;
+
+        border: none;
+
+        padding: 0;
+
+        margin: 0;
+
+        cursor: pointer;
+
+        appearance: none;
+
+        -webkit-appearance: none;
+    }
+
+
+    .recipients-page .recipient-actions .edit-button:hover {
+        text-decoration: underline;
+    }
+
+
+    /* =====================================================
+       DELETE BUTTON
+       ===================================================== */
+
+    .recipients-page .recipient-actions .delete-trigger {
+        color: #c93562;
+    }
+
+
+    .recipients-page .recipient-actions .delete-trigger:hover {
+        text-decoration: underline;
+    }
+
+
+    /* =====================================================
+       DELETE CONFIRMATION MODAL
+       ===================================================== */
+
+    .delete-modal-overlay {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        background: rgba(34, 24, 52, 0.28);
+
+        display: none;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 20px;
+
+        z-index: 5000;
+    }
+
+
+    .delete-modal-overlay.show {
+        display: flex;
+    }
+
+
+    .delete-modal {
+        width: 100%;
+
+        max-width: 370px;
+
+        background: #ffffff;
+
+        border-radius: 18px;
+
+        padding: 25px 23px 22px;
+
+        text-align: center;
+
+        border: 1px solid #eee9f8;
+
+        box-shadow:
+            0 18px 45px rgba(62, 38, 100, 0.18);
+
+        animation: deleteModalAppear 0.2s ease;
+    }
+
+
+    @keyframes deleteModalAppear {
+
+        from {
+            opacity: 0;
+
+            transform: translateY(8px) scale(0.97);
+        }
+
+        to {
+            opacity: 1;
+
+            transform: translateY(0) scale(1);
+        }
+
+    }
+
+
+    /* =====================================================
+       DELETE ICON
+       ===================================================== */
+
+    .delete-modal-icon {
+        width: 55px;
+
+        height: 55px;
+
+        margin: 0 auto 14px;
+
+        border-radius: 16px;
+
+        background: #fde8ed;
+
+        color: #c93562;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 24px;
+    }
+
+
+    /* =====================================================
+       DELETE TEXT
+       ===================================================== */
+
+    .delete-modal h2 {
+        font-size: 19px;
+
+        color: #171326;
+
+        margin-bottom: 7px;
+    }
+
+
+    .delete-modal p {
+        font-size: 12px;
+
+        color: #777084;
+
+        line-height: 1.5;
+
+        margin-bottom: 20px;
+    }
+
+
+    /* =====================================================
+       DELETE ACTIONS
+       ===================================================== */
+
+    .delete-modal-actions {
+        display: flex;
+
+        gap: 10px;
+    }
+
+
+    .delete-cancel-button,
+    .delete-confirm-button {
+        flex: 1;
+
+        min-height: 42px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        font-family: inherit;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition: 0.2s ease;
+
+        appearance: none;
+
+        -webkit-appearance: none;
+    }
+
+
+    .delete-cancel-button {
+        background: #f1edf8;
+
+        color: #5f586b;
+    }
+
+
+    .delete-cancel-button:hover {
+        background: #e6dfef;
+    }
+
+
+    .delete-confirm-button {
+        background: #e83d68;
+
+        color: #ffffff;
+    }
+
+
+    .delete-confirm-button:hover {
+        background: #d92f5b;
+
+        transform: translateY(-1px);
+    }
+
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 650px) {
+
+        .recipients-page .recipient-actions {
+            gap: 8px;
+        }
+
+
+        .delete-modal {
+            max-width: 330px;
+
+            padding: 22px 19px 19px;
+        }
+
+    }
+
+</style>
+
+
+<div class="recipients-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Recipients
+            </h1>
+
+            <p>
+                Manage the people you want to buy gifts for.
+            </p>
+
+        </div>
+
+
+        <!-- ADD RECIPIENT -->
+
+        <a
+            href="{{ url_for('recipient_form') }}"
+            class="primary-button"
+        >
+            + Add Recipient
+        </a>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RECIPIENT CONTENT
+         ===================================================== -->
+
+    {% if recipients %}
+
+
+        <div class="recipient-grid">
+
+            {% for recipient in recipients %}
+
+                <div class="recipient-card">
+
+
+                    <!-- =================================================
+                         RECIPIENT ICON
+                         ================================================= -->
+
+                    <div class="recipient-avatar">
+                        👤
+                    </div>
+
+
+
+                    <!-- =================================================
+                         RECIPIENT INFORMATION
+                         ================================================= -->
+
+                    <div class="recipient-info">
+
+                        <h3>
+                            {{ recipient.name }}
+                        </h3>
+
+
+                        <p>
+                            {{ recipient.relationship }}
+                        </p>
+
+
+                        {% if recipient.age %}
+
+                            <span>
+                                Age {{ recipient.age }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         ACTIONS
+                         ================================================= -->
+
+                    <div class="recipient-actions">
+
+
+                        <!-- EDIT -->
+
+                        <a
+                            href="{{ url_for(
+                                'edit_recipient',
+                                recipient_id=recipient.id
+                            ) }}"
+                            class="edit-button"
+                        >
+                            Edit
+                        </a>
+
+
+                        <!-- DELETE -->
+
+                        <button
+                            type="button"
+                            class="edit-button delete-trigger"
+                            data-recipient-id="{{ recipient.id }}"
+                            data-recipient-name="{{ recipient.name }}"
+                        >
+                            Delete
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- =================================================
+             EMPTY STATE
+             ================================================= -->
+
+        <div class="recipients-empty">
+
+
+            <div class="empty-recipient-icon">
+                👥
+            </div>
+
+
+            <h2>
+                No recipients yet
+            </h2>
+
+
+            <p>
+                Add someone you want to buy a gift for.
+            </p>
+
+
+            <a
+                href="{{ url_for('recipient_form') }}"
+                class="primary-button"
+            >
+                + Add Recipient
+            </a>
+
+
+        </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+
+<!-- =========================================================
+     DELETE CONFIRMATION MODAL
+     ========================================================= -->
+
+<div
+    class="delete-modal-overlay"
+    id="deleteModalOverlay"
+>
+
+    <div
+        class="delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="deleteModalTitle"
+    >
+
+
+        <!-- DELETE ICON -->
+
+        <div class="delete-modal-icon">
+            🗑️
+        </div>
+
+
+        <!-- TITLE -->
+
+        <h2 id="deleteModalTitle">
+            Delete Recipient?
+        </h2>
+
+
+        <!-- MESSAGE -->
+
+        <p id="deleteModalMessage">
+            Are you sure you want to delete this recipient?
+            This action cannot be undone.
+        </p>
+
+
+        <!-- ACTIONS -->
+
+        <div class="delete-modal-actions">
+
+
+            <button
+                type="button"
+                class="delete-cancel-button"
+                id="deleteCancelButton"
+            >
+                Cancel
+            </button>
+
+
+            <button
+                type="button"
+                class="delete-confirm-button"
+                id="deleteConfirmButton"
+            >
+                Delete
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    /* =====================================================
+       DELETE MODAL ELEMENTS
+       ===================================================== */
+
+    const deleteModalOverlay =
+        document.getElementById(
+            "deleteModalOverlay"
+        );
+
+
+    const deleteModalMessage =
+        document.getElementById(
+            "deleteModalMessage"
+        );
+
+
+    const deleteCancelButton =
+        document.getElementById(
+            "deleteCancelButton"
+        );
+
+
+    const deleteConfirmButton =
+        document.getElementById(
+            "deleteConfirmButton"
+        );
+
+
+    const deleteTriggers =
+        document.querySelectorAll(
+            ".delete-trigger"
+        );
+
+
+    let selectedRecipientId = null;
+
+
+
+    /* =====================================================
+       OPEN DELETE MODAL
+       ===================================================== */
+
+    deleteTriggers.forEach(
+        function (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    selectedRecipientId =
+                        button.dataset.recipientId;
+
+
+                    const recipientName =
+                        button.dataset.recipientName;
+
+
+                    deleteModalMessage.textContent =
+                        `Are you sure you want to delete "${recipientName}"? This action cannot be undone.`;
+
+
+                    deleteModalOverlay.classList.add(
+                        "show"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+
+    /* =====================================================
+       CLOSE DELETE MODAL
+       ===================================================== */
+
+    function closeDeleteModal() {
+
+        deleteModalOverlay.classList.remove(
+            "show"
+        );
+
+
+        selectedRecipientId = null;
+
+    }
+
+
+
+    /* =====================================================
+       CANCEL
+       ===================================================== */
+
+    if (deleteCancelButton) {
+
+        deleteCancelButton.addEventListener(
+            "click",
+            function () {
+
+                closeDeleteModal();
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CONFIRM DELETE
+       ===================================================== */
+
+    if (deleteConfirmButton) {
+
+        deleteConfirmButton.addEventListener(
+            "click",
+            function () {
+
+                if (!selectedRecipientId) {
+
+                    return;
+
+                }
+
+
+                window.location.href =
+                    `/recipients/delete/${selectedRecipientId}`;
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CLICK OUTSIDE MODAL
+       ===================================================== */
+
+    if (deleteModalOverlay) {
+
+        deleteModalOverlay.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target ===
+                    deleteModalOverlay
+                ) {
+
+                    closeDeleteModal();
+
+                }
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       ESCAPE KEY
+       ===================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape" &&
+                deleteModalOverlay.classList.contains(
+                    "show"
+                )
+            ) {
+
+                closeDeleteModal();
+
+            }
+
+        }
+    );
+
+</script>
+
+
+{% endblock %}

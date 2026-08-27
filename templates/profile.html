@@ -1,0 +1,756 @@
+{% extends "base.html" %}
+
+{% block title %}
+Profile - Gift Genie
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+
+    /* =====================================================
+       PROFILE PAGE
+       ===================================================== */
+
+    .profile-page {
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+
+    /* =====================================================
+       PROFILE CARD
+       ===================================================== */
+
+    .profile-page .profile-card {
+        margin-bottom: 18px;
+    }
+
+
+    /* =====================================================
+       PROFILE ACTIVITY GRID
+       ===================================================== */
+
+    .profile-activity-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap: 16px;
+    }
+
+
+    .profile-activity-card {
+        background: white;
+
+        border-radius: 17px;
+
+        padding: 18px;
+
+        min-width: 0;
+
+        box-shadow:
+            0 5px 18px rgba(87, 56, 130, 0.045);
+    }
+
+
+    .profile-activity-card h2 {
+        font-size: 17px;
+
+        color: #171326;
+
+        margin-bottom: 5px;
+    }
+
+
+    .profile-count {
+        font-size: 10px;
+
+        color: #81798c;
+
+        margin-bottom: 13px;
+    }
+
+
+    /* =====================================================
+       SCROLLABLE LIST
+       ===================================================== */
+
+    .profile-list {
+        max-height: 280px;
+
+        overflow-y: auto;
+
+        overflow-x: hidden;
+
+        padding-right: 5px;
+    }
+
+
+    .profile-list::-webkit-scrollbar {
+        width: 5px;
+    }
+
+
+    .profile-list::-webkit-scrollbar-track {
+        background: #f5f1fa;
+
+        border-radius: 10px;
+    }
+
+
+    .profile-list::-webkit-scrollbar-thumb {
+        background: #d9c8ee;
+
+        border-radius: 10px;
+    }
+
+
+    /* =====================================================
+       RECIPIENT ITEMS
+       ===================================================== */
+
+    .profile-recipient-item {
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        padding: 10px 4px;
+
+        border-bottom: 1px solid #f1edf7;
+    }
+
+
+    .profile-recipient-item:last-child {
+        border-bottom: none;
+    }
+
+
+    .profile-item-icon {
+        width: 36px;
+        height: 36px;
+
+        border-radius: 10px;
+
+        background: #eadcff;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        font-size: 16px;
+
+        flex-shrink: 0;
+    }
+
+
+    .profile-item-info {
+        min-width: 0;
+
+        flex: 1;
+    }
+
+
+    .profile-item-name {
+        font-size: 12px;
+
+        font-weight: 700;
+
+        color: #2a2338;
+
+        margin-bottom: 3px;
+    }
+
+
+    .profile-item-detail {
+        font-size: 10px;
+
+        color: #81798c;
+
+        line-height: 1.4;
+    }
+
+
+    /* =====================================================
+       SAVED GIFT ITEMS
+       ===================================================== */
+
+    .profile-gift-item {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 10px;
+
+        padding: 10px 4px;
+
+        border-bottom: 1px solid #f1edf7;
+    }
+
+
+    .profile-gift-item:last-child {
+        border-bottom: none;
+    }
+
+
+    .profile-gift-icon {
+        width: 36px;
+        height: 36px;
+
+        border-radius: 10px;
+
+        background: #f2eafa;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        font-size: 16px;
+
+        flex-shrink: 0;
+    }
+
+
+    .profile-gift-info {
+        min-width: 0;
+
+        flex: 1;
+    }
+
+
+    .profile-gift-name {
+        font-size: 12px;
+
+        font-weight: 700;
+
+        color: #2a2338;
+
+        margin-bottom: 3px;
+    }
+
+
+    .profile-gift-recipient {
+        font-size: 10px;
+
+        color: #777084;
+
+        margin-bottom: 3px;
+    }
+
+
+    .profile-gift-price {
+        font-size: 10px;
+
+        font-weight: 700;
+
+        color: #27a34a;
+    }
+
+
+    /* =====================================================
+       OCCASION ITEMS
+       ===================================================== */
+
+    .profile-occasion-item {
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        padding: 10px 4px;
+
+        border-bottom: 1px solid #f1edf7;
+    }
+
+
+    .profile-occasion-item:last-child {
+        border-bottom: none;
+    }
+
+
+    .profile-occasion-icon {
+        width: 36px;
+        height: 36px;
+
+        border-radius: 10px;
+
+        background: #ffe9bd;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        font-size: 16px;
+
+        flex-shrink: 0;
+    }
+
+
+    .profile-occasion-info {
+        min-width: 0;
+
+        flex: 1;
+    }
+
+
+    .profile-occasion-name {
+        font-size: 12px;
+
+        font-weight: 700;
+
+        color: #2a2338;
+
+        margin-bottom: 3px;
+    }
+
+
+    .profile-occasion-type {
+        font-size: 10px;
+
+        color: #777084;
+
+        margin-bottom: 2px;
+    }
+
+
+    .profile-occasion-date {
+        font-size: 10px;
+
+        color: #9991a3;
+    }
+
+
+    .profile-occasion-days {
+        font-size: 10px;
+
+        font-weight: 700;
+
+        color: #713ddd;
+
+        white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+       ===================================================== */
+
+    .profile-list-empty {
+        min-height: 180px;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        justify-content: center;
+
+        text-align: center;
+
+        padding: 20px;
+    }
+
+
+    .profile-list-empty-icon {
+        font-size: 27px;
+
+        margin-bottom: 9px;
+    }
+
+
+    .profile-list-empty p {
+        font-size: 11px;
+
+        color: #81798c;
+
+        line-height: 1.5;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @media (max-width: 1000px) {
+
+        .profile-activity-grid {
+            grid-template-columns:
+                1fr 1fr;
+        }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+        .profile-activity-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .profile-list {
+            max-height: 240px;
+        }
+
+    }
+
+</style>
+
+
+<div class="profile-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Profile
+            </h1>
+
+            <p>
+                View your Gift Genie profile and activity.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         USER PROFILE
+         ===================================================== -->
+
+    <div class="profile-card">
+
+        <div class="recipient-avatar">
+            👤
+        </div>
+
+
+        <div class="recipient-info">
+
+            <h3>
+                {{ user["username"] }}
+            </h3>
+
+            <p>
+                Gift Genie User
+            </p>
+
+            <span>
+                {{ user["email"] }}
+            </span>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         PROFILE ACTIVITY
+         ===================================================== -->
+
+    <div class="profile-activity-grid">
+
+
+        <!-- =================================================
+             RECIPIENTS
+             ================================================= -->
+
+        <div class="profile-activity-card">
+
+            <h2>
+                Your Recipients
+            </h2>
+
+            <div class="profile-count">
+
+                {{ profile_recipients|length }}
+
+                {% if profile_recipients|length == 1 %}
+                    recipient
+                {% else %}
+                    recipients
+                {% endif %}
+
+            </div>
+
+
+            {% if profile_recipients %}
+
+                <div class="profile-list">
+
+                    {% for recipient in profile_recipients %}
+
+                        <div class="profile-recipient-item">
+
+                            <div class="profile-item-icon">
+                                👤
+                            </div>
+
+
+                            <div class="profile-item-info">
+
+                                <div class="profile-item-name">
+                                    {{ recipient["name"] }}
+                                </div>
+
+
+                                <div class="profile-item-detail">
+
+                                    {{ recipient["relationship"] }}
+
+                                    ·
+
+                                    {{ recipient["interest"] }}
+
+                                </div>
+
+
+                                <div class="profile-item-detail">
+
+                                    Age {{ recipient["age"] }}
+
+                                    ·
+
+                                    RM{{ "%.0f"|format(recipient["budget"]) }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="profile-list-empty">
+
+                    <div class="profile-list-empty-icon">
+                        👤
+                    </div>
+
+                    <p>
+                        No recipients added yet.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- =================================================
+             SAVED GIFTS
+             ================================================= -->
+
+        <div class="profile-activity-card">
+
+            <h2>
+                Saved Gifts
+            </h2>
+
+            <div class="profile-count">
+
+                {{ profile_saved_gifts|length }}
+
+                {% if profile_saved_gifts|length == 1 %}
+                    saved gift
+                {% else %}
+                    saved gifts
+                {% endif %}
+
+            </div>
+
+
+            {% if profile_saved_gifts %}
+
+                <div class="profile-list">
+
+                    {% for gift in profile_saved_gifts %}
+
+                        <div class="profile-gift-item">
+
+                            <div class="profile-gift-icon">
+                                🎁
+                            </div>
+
+
+                            <div class="profile-gift-info">
+
+                                <div class="profile-gift-name">
+                                    {{ gift["gift_name"] }}
+                                </div>
+
+
+                                <div class="profile-gift-recipient">
+
+                                    For {{ gift["recipient_name"] }}
+
+                                </div>
+
+
+                                <div class="profile-gift-price">
+
+                                    RM{{ "%.0f"|format(gift["min_price"]) }}
+
+                                    -
+
+                                    RM{{ "%.0f"|format(gift["max_price"]) }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="profile-list-empty">
+
+                    <div class="profile-list-empty-icon">
+                        ❤️
+                    </div>
+
+                    <p>
+                        No saved gifts yet.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- =================================================
+             UPCOMING OCCASIONS
+             ================================================= -->
+
+        <div class="profile-activity-card">
+
+            <h2>
+                Upcoming Occasions
+            </h2>
+
+            <div class="profile-count">
+
+                {{ profile_occasions|length }}
+
+                {% if profile_occasions|length == 1 %}
+                    occasion
+                {% else %}
+                    occasions
+                {% endif %}
+
+            </div>
+
+
+            {% if profile_occasions %}
+
+                <div class="profile-list">
+
+                    {% for occasion in profile_occasions %}
+
+                        <div class="profile-occasion-item">
+
+                            <div class="profile-occasion-icon">
+                                📅
+                            </div>
+
+
+                            <div class="profile-occasion-info">
+
+                                <div class="profile-occasion-name">
+                                    {{ occasion["name"] }}
+                                </div>
+
+
+                                <div class="profile-occasion-type">
+                                    {{ occasion["occasion"] }}
+                                </div>
+
+
+                                <div class="profile-occasion-date">
+                                    {{ occasion["date"] }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="profile-occasion-days">
+
+                                {% if occasion["days"] == 0 %}
+
+                                    Today
+
+                                {% elif occasion["days"] == 1 %}
+
+                                    Tomorrow
+
+                                {% else %}
+
+                                    {{ occasion["days"] }}d
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="profile-list-empty">
+
+                    <div class="profile-list-empty-icon">
+                        📅
+                    </div>
+
+                    <p>
+                        No upcoming occasions yet.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+{% endblock %}

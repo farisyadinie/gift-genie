@@ -1,0 +1,764 @@
+{% extends "base.html" %}
+
+{% block title %}
+Settings - Gift Genie
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+
+    /* =====================================================
+       SETTINGS PAGE
+       ===================================================== */
+
+    .settings-page {
+        width: 100%;
+    }
+
+
+    /* =====================================================
+       SETTINGS CARD
+       ===================================================== */
+
+    .settings-page .content-card {
+        position: relative;
+    }
+
+
+    /* =====================================================
+       BUDGET NOTE
+       ===================================================== */
+
+    .settings-budget-note {
+        font-size: 10px;
+
+        color: #81798c;
+
+        line-height: 1.4;
+
+        margin-top: 2px;
+    }
+
+
+    /* =====================================================
+       CUSTOM MODAL
+       ===================================================== */
+
+    .settings-modal-overlay {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        background: rgba(34, 24, 52, 0.28);
+
+        display: none;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 20px;
+
+        z-index: 5000;
+    }
+
+
+    .settings-modal-overlay.show {
+        display: flex;
+    }
+
+
+    .settings-modal {
+        width: 100%;
+
+        max-width: 360px;
+
+        background: #ffffff;
+
+        border-radius: 18px;
+
+        padding: 25px 23px 22px;
+
+        text-align: center;
+
+        box-shadow:
+            0 18px 45px rgba(62, 38, 100, 0.18);
+
+        border: 1px solid #eee9f8;
+
+        animation: settingsModalAppear 0.2s ease;
+    }
+
+
+    @keyframes settingsModalAppear {
+
+        from {
+            opacity: 0;
+
+            transform: translateY(8px) scale(0.97);
+        }
+
+        to {
+            opacity: 1;
+
+            transform: translateY(0) scale(1);
+        }
+
+    }
+
+
+    /* =====================================================
+       MODAL ICON
+       ===================================================== */
+
+    .settings-modal-icon {
+        width: 55px;
+
+        height: 55px;
+
+        margin: 0 auto 13px;
+
+        border-radius: 16px;
+
+        background: #e4f7e9;
+
+        color: #258247;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 26px;
+
+        font-weight: 700;
+    }
+
+
+    /* =====================================================
+       ERROR MODAL ICON
+       ===================================================== */
+
+    .settings-modal.error .settings-modal-icon {
+        background: #fde8ed;
+
+        color: #c43560;
+    }
+
+
+    /* =====================================================
+       MODAL TEXT
+       ===================================================== */
+
+    .settings-modal h2 {
+        font-size: 19px;
+
+        color: #171326;
+
+        margin-bottom: 6px;
+    }
+
+
+    .settings-modal p {
+        font-size: 12px;
+
+        color: #777084;
+
+        line-height: 1.5;
+
+        margin-bottom: 18px;
+    }
+
+
+    /* =====================================================
+       MODAL BUTTON
+       ===================================================== */
+
+    .settings-modal-button {
+        width: 100%;
+
+        min-height: 42px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        background: #713ddd;
+
+        color: #ffffff;
+
+        font-family: inherit;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition: 0.2s ease;
+    }
+
+
+    .settings-modal-button:hover {
+        background: #5e2fc7;
+
+        transform: translateY(-1px);
+    }
+
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 650px) {
+
+        .settings-modal {
+            max-width: 330px;
+
+            padding: 22px 19px 19px;
+        }
+
+    }
+
+</style>
+
+
+<div class="recipients-page settings-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Settings
+            </h1>
+
+            <p>
+                Manage your Gift Genie preferences.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SETTINGS CARD
+         ===================================================== -->
+
+    <div class="content-card">
+
+
+        <!-- =================================================
+             NOTIFICATIONS
+             ================================================= -->
+
+        <div class="form-group">
+
+            <label for="notificationSetting">
+                Notifications
+            </label>
+
+
+            <select id="notificationSetting">
+
+                <option
+                    value="enabled"
+
+                    {% if user
+                          and user["notifications_enabled"] == 1 %}
+
+                        selected
+
+                    {% endif %}
+                >
+                    Enabled
+                </option>
+
+
+                <option
+                    value="disabled"
+
+                    {% if user
+                          and user["notifications_enabled"] == 0 %}
+
+                        selected
+
+                    {% endif %}
+                >
+                    Disabled
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+        <!-- =================================================
+             DEFAULT GIFT BUDGET
+             ================================================= -->
+
+        <div class="form-group">
+
+            <label for="defaultBudget">
+                Default Gift Budget
+            </label>
+
+
+            <div class="budget-input">
+
+                <span>
+                    RM
+                </span>
+
+
+                <input
+                    type="number"
+                    id="defaultBudget"
+                    min="10"
+                    max="1000"
+                    step="1"
+
+                    value="{{ user['default_budget'] if user and user['default_budget'] else 250 }}"
+
+                    required
+                >
+
+            </div>
+
+
+            <div class="settings-budget-note">
+                Enter a budget between RM10 and RM1,000.
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             SAVE BUTTON
+             ================================================= -->
+
+        <div class="form-actions">
+
+            <button
+                type="button"
+                class="primary-button"
+                id="saveSettingsButton"
+            >
+                Save Settings
+            </button>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     CUSTOM SETTINGS MODAL
+     ========================================================= -->
+
+<div
+    class="settings-modal-overlay"
+    id="settingsModalOverlay"
+>
+
+    <div
+        class="settings-modal"
+        id="settingsModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settingsModalTitle"
+    >
+
+
+        <!-- MODAL ICON -->
+
+        <div
+            class="settings-modal-icon"
+            id="settingsModalIcon"
+        >
+            ✓
+        </div>
+
+
+
+        <!-- MODAL TITLE -->
+
+        <h2 id="settingsModalTitle">
+            Settings Saved
+        </h2>
+
+
+
+        <!-- MODAL MESSAGE -->
+
+        <p id="settingsModalMessage">
+            Your Gift Genie preferences have been saved successfully!
+        </p>
+
+
+
+        <!-- MODAL BUTTON -->
+
+        <button
+            type="button"
+            class="settings-modal-button"
+            id="settingsModalButton"
+        >
+            OK
+        </button>
+
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    /* =====================================================
+       SETTINGS ELEMENTS
+       ===================================================== */
+
+    const saveSettingsButton =
+        document.getElementById(
+            "saveSettingsButton"
+        );
+
+
+    const settingsModalOverlay =
+        document.getElementById(
+            "settingsModalOverlay"
+        );
+
+
+    const settingsModal =
+        document.getElementById(
+            "settingsModal"
+        );
+
+
+    const settingsModalButton =
+        document.getElementById(
+            "settingsModalButton"
+        );
+
+
+    const settingsModalIcon =
+        document.getElementById(
+            "settingsModalIcon"
+        );
+
+
+    const settingsModalTitle =
+        document.getElementById(
+            "settingsModalTitle"
+        );
+
+
+    const settingsModalMessage =
+        document.getElementById(
+            "settingsModalMessage"
+        );
+
+
+    const defaultBudgetInput =
+        document.getElementById(
+            "defaultBudget"
+        );
+
+
+    const notificationSetting =
+        document.getElementById(
+            "notificationSetting"
+        );
+
+
+
+    /* =====================================================
+       SHOW SUCCESS MODAL
+       ===================================================== */
+
+    function showSuccessModal(message) {
+
+        settingsModal.classList.remove(
+            "error"
+        );
+
+
+        settingsModalIcon.textContent =
+            "✓";
+
+
+        settingsModalTitle.textContent =
+            "Settings Saved";
+
+
+        settingsModalMessage.textContent =
+            message;
+
+
+        settingsModalOverlay.classList.add(
+            "show"
+        );
+
+    }
+
+
+
+    /* =====================================================
+       SHOW ERROR MODAL
+       ===================================================== */
+
+    function showErrorModal(message) {
+
+        settingsModal.classList.add(
+            "error"
+        );
+
+
+        settingsModalIcon.textContent =
+            "!";
+
+
+        settingsModalTitle.textContent =
+            "Invalid Settings";
+
+
+        settingsModalMessage.textContent =
+            message;
+
+
+        settingsModalOverlay.classList.add(
+            "show"
+        );
+
+    }
+
+
+
+    /* =====================================================
+       SAVE SETTINGS
+       ===================================================== */
+
+    if (saveSettingsButton) {
+
+        saveSettingsButton.addEventListener(
+            "click",
+            async function () {
+
+
+                const budget =
+                    Number(
+                        defaultBudgetInput.value
+                    );
+
+
+                /* -----------------------------------------
+                   VALIDATE BUDGET
+                   ----------------------------------------- */
+
+                if (
+                    !Number.isInteger(budget) ||
+                    budget < 10 ||
+                    budget > 1000
+                ) {
+
+                    showErrorModal(
+                        "Default Gift Budget must be between RM10 and RM1,000."
+                    );
+
+                    return;
+
+                }
+
+
+                saveSettingsButton.disabled =
+                    true;
+
+
+                saveSettingsButton.textContent =
+                    "Saving...";
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "{{ url_for('settings') }}",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body: JSON.stringify({
+
+                                    default_budget:
+                                        budget,
+
+                                    notifications:
+                                        notificationSetting.value
+
+                                })
+
+                            }
+                        );
+
+
+                    const result =
+                        await response.json();
+
+
+                    if (
+                        !response.ok ||
+                        !result.success
+                    ) {
+
+                        throw new Error(
+                            result.message ||
+                            "Unable to save settings."
+                        );
+
+                    }
+
+
+                    /* -------------------------------------
+                       SUCCESS
+                       ------------------------------------- */
+
+                    showSuccessModal(
+                        "Your Gift Genie preferences have been saved successfully!"
+                    );
+
+                }
+
+
+                catch (error) {
+
+                    showErrorModal(
+                        error.message ||
+                        "Unable to save settings."
+                    );
+
+                }
+
+
+                finally {
+
+                    saveSettingsButton.disabled =
+                        false;
+
+
+                    saveSettingsButton.textContent =
+                        "Save Settings";
+
+                }
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CLOSE MODAL
+       ===================================================== */
+
+    if (
+        settingsModalButton &&
+        settingsModalOverlay
+    ) {
+
+        settingsModalButton.addEventListener(
+            "click",
+            function () {
+
+                settingsModalOverlay.classList.remove(
+                    "show"
+                );
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CLOSE WHEN CLICKING OUTSIDE
+       ===================================================== */
+
+    if (settingsModalOverlay) {
+
+        settingsModalOverlay.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target ===
+                    settingsModalOverlay
+                ) {
+
+                    settingsModalOverlay.classList.remove(
+                        "show"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CLOSE WITH ESCAPE
+       ===================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape" &&
+                settingsModalOverlay &&
+                settingsModalOverlay.classList.contains("show")
+            ) {
+
+                settingsModalOverlay.classList.remove(
+                    "show"
+                );
+
+            }
+
+        }
+    );
+
+</script>
+
+
+{% endblock %}

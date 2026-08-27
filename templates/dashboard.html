@@ -1,0 +1,444 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard - Gift Genie
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard-page">
+
+
+    <!-- =====================================================
+         WELCOME
+         ===================================================== -->
+
+    <div class="welcome-section">
+
+        <h1>
+            Welcome back, {{ session.get("user_name", "User") }}! 👋
+        </h1>
+
+        <p>
+            Let's find the perfect gift for your special people.
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         STATISTICS
+         ===================================================== -->
+
+    <div class="stats-grid">
+
+
+        <!-- RECIPIENTS -->
+
+        <a
+            href="{{ url_for('recipients') }}"
+            class="stat-card stat-card-link"
+        >
+
+            <div class="stat-icon purple">
+                👥
+            </div>
+
+            <div>
+
+                <div class="stat-number">
+                    {{ recipient_count }}
+                </div>
+
+                <div class="stat-label">
+                    Total Recipients
+                </div>
+
+            </div>
+
+        </a>
+
+
+
+        <!-- GIFT IDEAS -->
+
+        <a
+            href="{{ url_for('gift_ideas') }}"
+            class="stat-card stat-card-link"
+        >
+
+            <div class="stat-icon pink">
+                🎁
+            </div>
+
+            <div>
+
+                <div class="stat-number">
+                    {{ gift_count }}
+                </div>
+
+                <div class="stat-label">
+                    Total Gift Ideas
+                </div>
+
+            </div>
+
+        </a>
+
+
+
+        <!-- OCCASIONS -->
+
+        <a
+            href="{{ url_for('occasions') }}"
+            class="stat-card stat-card-link"
+        >
+
+            <div class="stat-icon yellow">
+                📅
+            </div>
+
+            <div>
+
+                <div class="stat-number">
+                    {{ occasion_count }}
+                </div>
+
+                <div class="stat-label">
+                    Upcoming Occasions
+                </div>
+
+            </div>
+
+        </a>
+
+
+
+        <!-- SAVED GIFTS -->
+
+        <a
+            href="{{ url_for('saved_gifts') }}"
+            class="stat-card stat-card-link"
+        >
+
+            <div class="stat-icon green">
+                ❤️
+            </div>
+
+            <div>
+
+                <div class="stat-number">
+                    {{ saved_count }}
+                </div>
+
+                <div class="stat-label">
+                    Saved Gifts
+                </div>
+
+            </div>
+
+        </a>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         LOWER DASHBOARD
+         ===================================================== -->
+
+    <div class="dashboard-grid">
+
+
+        <!-- =================================================
+             UPCOMING OCCASIONS
+             ================================================= -->
+
+        <div class="dashboard-card">
+
+
+            <h2>
+                Upcoming Occasions
+            </h2>
+
+
+            {% if upcoming_occasions %}
+
+                <div class="occasion-list">
+
+
+                    {% for occasion in upcoming_occasions %}
+
+                        <div class="occasion-card">
+
+                            <div class="occasion-icon">
+                                📅
+                            </div>
+
+
+                            <div class="occasion-info">
+
+                                <div class="occasion-name">
+                                    {{ occasion["name"] }}
+                                </div>
+
+
+                                <div class="occasion-type">
+                                    {{ occasion["occasion"] }}
+                                </div>
+
+
+                                <div class="occasion-date">
+
+                                    {{ occasion["date"] }}
+
+
+                                    {% if occasion["days"] == 0 %}
+
+                                        · Today
+
+                                    {% elif occasion["days"] == 1 %}
+
+                                        · Tomorrow
+
+                                    {% else %}
+
+                                        · {{ occasion["days"] }} days
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+
+                </div>
+
+
+            {% else %}
+
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        📅
+                    </div>
+
+
+                    <p>
+                        No upcoming occasions yet.
+                    </p>
+
+
+                    <a
+                        href="{{ url_for('occasion_form') }}"
+                        class="btn btn-primary"
+                    >
+                        + Add Occasion
+                    </a>
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             RECENT GIFT IDEAS
+             ================================================= -->
+
+        <div class="dashboard-card">
+
+
+            <h2>
+                Recent Gift Ideas
+            </h2>
+
+
+            {% if recent_gifts %}
+
+                <div class="gift-list">
+
+
+                    {% for gift in recent_gifts %}
+
+                        <div class="gift-card">
+
+
+                            <div class="gift-icon">
+                                🎁
+                            </div>
+
+
+                            <div>
+
+                                <div class="gift-name">
+                                    {{ gift["name"] }}
+                                </div>
+
+
+                                <div class="gift-description">
+                                    {{ gift["description"] }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="gift-price">
+                                {{ gift["price"] }}
+                            </div>
+
+
+                        </div>
+
+                    {% endfor %}
+
+
+                </div>
+
+
+            {% else %}
+
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        🎁
+                    </div>
+
+
+                    <p>
+                        No gift ideas generated yet.
+                    </p>
+
+
+                    <a
+                        href="{{ url_for('gift_ideas') }}"
+                        class="btn btn-primary"
+                    >
+                        Generate Gift Ideas
+                    </a>
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             QUICK ACTIONS
+             ================================================= -->
+
+        <div class="dashboard-card">
+
+
+            <h2>
+                Quick Actions
+            </h2>
+
+
+            <div class="quick-actions">
+
+
+                <!-- ADD RECIPIENT -->
+
+                <a
+                    href="{{ url_for('recipient_form') }}"
+                    class="quick-action purple"
+                >
+
+                    <span>
+                        ＋
+                    </span>
+
+                    <span>
+                        Add Recipient
+                    </span>
+
+                </a>
+
+
+
+                <!-- GENERATE GIFTS -->
+
+                <a
+                    href="{{ url_for('gift_ideas') }}"
+                    class="quick-action pink"
+                >
+
+                    <span>
+                        🎁
+                    </span>
+
+                    <span>
+                        Generate Gift Ideas
+                    </span>
+
+                </a>
+
+
+
+                <!-- OCCASIONS -->
+
+                <a
+                    href="{{ url_for('occasions') }}"
+                    class="quick-action yellow"
+                >
+
+                    <span>
+                        📅
+                    </span>
+
+                    <span>
+                        View Occasions
+                    </span>
+
+                </a>
+
+
+
+                <!-- SAVED GIFTS -->
+
+                <a
+                    href="{{ url_for('saved_gifts') }}"
+                    class="quick-action green"
+                >
+
+                    <span>
+                        ❤️
+                    </span>
+
+                    <span>
+                        Saved Gifts
+                    </span>
+
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+{% endblock %}

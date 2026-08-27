@@ -1,0 +1,809 @@
+{% extends "base.html" %}
+
+{% block title %}
+Occasions - Gift Genie
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+
+    /* =====================================================
+       OCCASIONS PAGE
+       ===================================================== */
+
+    .occasions-page {
+        width: 100%;
+    }
+
+
+    /* =====================================================
+       OCCASION CARDS
+       ===================================================== */
+
+    .occasions-page .recipient-card {
+        position: relative;
+
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 14px;
+
+        min-height: 145px;
+    }
+
+
+    .occasions-page .recipient-info {
+        flex: 1;
+
+        min-width: 0;
+
+        padding-right: 5px;
+
+        padding-bottom: 32px;
+    }
+
+
+    .occasions-page .recipient-info h3 {
+        margin-bottom: 6px;
+
+        line-height: 1.2;
+    }
+
+
+    .occasions-page .recipient-info p {
+        margin-bottom: 8px;
+
+        line-height: 1.35;
+    }
+
+
+    .occasions-page .recipient-info span {
+        display: block;
+
+        margin-top: 5px;
+    }
+
+
+    /* =====================================================
+       ACTIONS
+       ===================================================== */
+
+    .occasions-page .recipient-actions {
+        position: absolute;
+
+        right: 18px;
+
+        bottom: 18px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: flex-end;
+
+        gap: 12px;
+
+        white-space: nowrap;
+    }
+
+
+    .occasions-page .recipient-actions .edit-button {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        white-space: nowrap;
+
+        text-decoration: none;
+
+        line-height: 1;
+
+        cursor: pointer;
+
+        background: none;
+
+        border: none;
+
+        padding: 0;
+
+        margin: 0;
+
+        font-family: inherit;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        color: #713ddd;
+
+        appearance: none;
+
+        -webkit-appearance: none;
+    }
+
+
+    .occasions-page .recipient-actions .edit-button:hover {
+        text-decoration: underline;
+    }
+
+
+    /* =====================================================
+       DELETE BUTTON
+       ===================================================== */
+
+    .occasions-page .delete-occasion-trigger {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        background: none;
+
+        border: none;
+
+        padding: 0;
+
+        margin: 0;
+
+        font-family: inherit;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        line-height: 1;
+
+        color: #c93562;
+
+        cursor: pointer;
+
+        appearance: none;
+
+        -webkit-appearance: none;
+    }
+
+
+    .occasions-page .delete-occasion-trigger:hover {
+        text-decoration: underline;
+    }
+
+
+    /* =====================================================
+       DELETE MODAL
+       ===================================================== */
+
+    .occasion-delete-modal-overlay {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        background: rgba(34, 24, 52, 0.28);
+
+        display: none;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 20px;
+
+        z-index: 5000;
+    }
+
+
+    .occasion-delete-modal-overlay.show {
+        display: flex;
+    }
+
+
+    .occasion-delete-modal {
+        width: 100%;
+
+        max-width: 370px;
+
+        background: #ffffff;
+
+        border-radius: 18px;
+
+        padding: 25px 23px 22px;
+
+        text-align: center;
+
+        border: 1px solid #eee9f8;
+
+        box-shadow:
+            0 18px 45px rgba(62, 38, 100, 0.18);
+
+        animation: occasionDeleteModalAppear 0.2s ease;
+    }
+
+
+    @keyframes occasionDeleteModalAppear {
+
+        from {
+            opacity: 0;
+
+            transform: translateY(8px) scale(0.97);
+        }
+
+        to {
+            opacity: 1;
+
+            transform: translateY(0) scale(1);
+        }
+
+    }
+
+
+    /* =====================================================
+       MODAL ICON
+       ===================================================== */
+
+    .occasion-delete-modal-icon {
+        width: 55px;
+
+        height: 55px;
+
+        margin: 0 auto 14px;
+
+        border-radius: 16px;
+
+        background: #fde8ed;
+
+        color: #c93562;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 24px;
+    }
+
+
+    /* =====================================================
+       MODAL TEXT
+       ===================================================== */
+
+    .occasion-delete-modal h2 {
+        font-size: 19px;
+
+        color: #171326;
+
+        margin-bottom: 7px;
+    }
+
+
+    .occasion-delete-modal p {
+        font-size: 12px;
+
+        color: #777084;
+
+        line-height: 1.5;
+
+        margin-bottom: 20px;
+    }
+
+
+    /* =====================================================
+       MODAL ACTIONS
+       ===================================================== */
+
+    .occasion-delete-modal-actions {
+        display: flex;
+
+        gap: 10px;
+    }
+
+
+    .occasion-delete-cancel-button,
+    .occasion-delete-confirm-button {
+        flex: 1;
+
+        min-height: 42px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        font-family: inherit;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition: 0.2s ease;
+
+        appearance: none;
+
+        -webkit-appearance: none;
+    }
+
+
+    .occasion-delete-cancel-button {
+        background: #f1edf8;
+
+        color: #5f586b;
+    }
+
+
+    .occasion-delete-cancel-button:hover {
+        background: #e6dfef;
+    }
+
+
+    .occasion-delete-confirm-button {
+        background: #e83d68;
+
+        color: #ffffff;
+    }
+
+
+    .occasion-delete-confirm-button:hover {
+        background: #d92f5b;
+
+        transform: translateY(-1px);
+    }
+
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 900px) {
+
+        .occasions-page .recipient-card {
+            min-height: 160px;
+        }
+
+
+        .occasions-page .recipient-actions {
+            right: 16px;
+
+            bottom: 16px;
+
+            gap: 9px;
+        }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+        .occasion-delete-modal {
+            max-width: 330px;
+
+            padding: 22px 19px 19px;
+        }
+
+    }
+
+</style>
+
+
+<div class="recipients-page occasions-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Occasions
+            </h1>
+
+            <p>
+                Keep track of important occasions and never miss a special day.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('occasion_form') }}"
+            class="primary-button"
+        >
+            + Add Occasion
+        </a>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         OCCASIONS CONTENT
+         ===================================================== -->
+
+    {% if occasions %}
+
+
+        <div class="recipient-grid">
+
+            {% for occasion in occasions %}
+
+                <div class="recipient-card">
+
+
+                    <!-- OCCASION ICON -->
+
+                    <div class="recipient-avatar">
+                        📅
+                    </div>
+
+
+                    <!-- OCCASION INFORMATION -->
+
+                    <div class="recipient-info">
+
+                        <h3>
+                            {{ occasion["occasion"] }}
+                        </h3>
+
+
+                        {% if occasion["recipient_name"] %}
+
+                            <p>
+                                {{ occasion["recipient_name"] }}
+                            </p>
+
+                        {% endif %}
+
+
+                        {% if occasion["date"] %}
+
+                            <span>
+                                {{ occasion["date"] }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="recipient-actions">
+
+
+                        <!-- EDIT -->
+
+                        <a
+                            href="{{ url_for(
+                                'edit_occasion',
+                                occasion_id=occasion['id']
+                            ) }}"
+                            class="edit-button"
+                        >
+                            Edit
+                        </a>
+
+
+                        <!-- DELETE -->
+
+                        <button
+                            type="button"
+                            class="delete-occasion-trigger"
+                            data-occasion-id="{{ occasion['id'] }}"
+                            data-occasion-name="{{ occasion['occasion'] }}"
+                            data-recipient-name="{{ occasion['recipient_name'] or 'this recipient' }}"
+                        >
+                            Delete
+                        </button>
+
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- EMPTY STATE -->
+
+        <div class="recipients-empty">
+
+            <div class="empty-recipient-icon">
+                📅
+            </div>
+
+
+            <h2>
+                No occasions yet
+            </h2>
+
+
+            <p>
+                Add a birthday, anniversary, or another special occasion.
+            </p>
+
+
+            <a
+                href="{{ url_for('occasion_form') }}"
+                class="primary-button"
+            >
+                + Add Occasion
+            </a>
+
+        </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+
+<!-- =========================================================
+     DELETE OCCASION MODAL
+     ========================================================= -->
+
+<div
+    class="occasion-delete-modal-overlay"
+    id="occasionDeleteModalOverlay"
+>
+
+    <div
+        class="occasion-delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="occasionDeleteModalTitle"
+    >
+
+        <div class="occasion-delete-modal-icon">
+            🗑️
+        </div>
+
+
+        <h2 id="occasionDeleteModalTitle">
+            Delete Occasion?
+        </h2>
+
+
+        <p id="occasionDeleteModalMessage">
+            Are you sure you want to delete this occasion?
+            This action cannot be undone.
+        </p>
+
+
+        <div class="occasion-delete-modal-actions">
+
+            <button
+                type="button"
+                class="occasion-delete-cancel-button"
+                id="occasionDeleteCancelButton"
+            >
+                Cancel
+            </button>
+
+
+            <button
+                type="button"
+                class="occasion-delete-confirm-button"
+                id="occasionDeleteConfirmButton"
+            >
+                Delete
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    /* =====================================================
+       OCCASION DELETE MODAL
+       ===================================================== */
+
+    const occasionDeleteModalOverlay =
+        document.getElementById(
+            "occasionDeleteModalOverlay"
+        );
+
+
+    const occasionDeleteModalMessage =
+        document.getElementById(
+            "occasionDeleteModalMessage"
+        );
+
+
+    const occasionDeleteCancelButton =
+        document.getElementById(
+            "occasionDeleteCancelButton"
+        );
+
+
+    const occasionDeleteConfirmButton =
+        document.getElementById(
+            "occasionDeleteConfirmButton"
+        );
+
+
+    const occasionDeleteTriggers =
+        document.querySelectorAll(
+            ".delete-occasion-trigger"
+        );
+
+
+    let selectedOccasionId = null;
+
+
+
+    /* =====================================================
+       OPEN MODAL
+       ===================================================== */
+
+    occasionDeleteTriggers.forEach(
+        function (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    selectedOccasionId =
+                        button.dataset.occasionId;
+
+
+                    const occasionName =
+                        button.dataset.occasionName;
+
+
+                    const recipientName =
+                        button.dataset.recipientName;
+
+
+                    occasionDeleteModalMessage.textContent =
+                        `Are you sure you want to delete "${occasionName}" for ${recipientName}? This action cannot be undone.`;
+
+
+                    occasionDeleteModalOverlay.classList.add(
+                        "show"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+
+    /* =====================================================
+       CLOSE MODAL
+       ===================================================== */
+
+    function closeOccasionDeleteModal() {
+
+        occasionDeleteModalOverlay.classList.remove(
+            "show"
+        );
+
+
+        selectedOccasionId = null;
+
+    }
+
+
+
+    /* =====================================================
+       CANCEL
+       ===================================================== */
+
+    if (occasionDeleteCancelButton) {
+
+        occasionDeleteCancelButton.addEventListener(
+            "click",
+            function () {
+
+                closeOccasionDeleteModal();
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CONFIRM DELETE
+       ===================================================== */
+
+    if (occasionDeleteConfirmButton) {
+
+        occasionDeleteConfirmButton.addEventListener(
+            "click",
+            function () {
+
+                if (!selectedOccasionId) {
+
+                    return;
+
+                }
+
+
+                window.location.href =
+                    `/occasions/delete/${selectedOccasionId}`;
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CLICK OUTSIDE
+       ===================================================== */
+
+    if (occasionDeleteModalOverlay) {
+
+        occasionDeleteModalOverlay.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target ===
+                    occasionDeleteModalOverlay
+                ) {
+
+                    closeOccasionDeleteModal();
+
+                }
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       ESCAPE KEY
+       ===================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape" &&
+                occasionDeleteModalOverlay.classList.contains(
+                    "show"
+                )
+            ) {
+
+                closeOccasionDeleteModal();
+
+            }
+
+        }
+    );
+
+</script>
+
+
+{% endblock %}

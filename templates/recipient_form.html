@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+    {% if edit_mode %}
+
+        Edit Recipient - Gift Genie
+
+    {% else %}
+
+        Add Recipient - Gift Genie
+
+    {% endif %}
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="recipients-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            {% if edit_mode %}
+
+                <h1>
+                    Edit Recipient
+                </h1>
+
+                <p>
+                    Update the recipient's information.
+                </p>
+
+            {% else %}
+
+                <h1>
+                    Add Recipient
+                </h1>
+
+                <p>
+                    Add someone you want to buy a gift for.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         FORM
+         ===================================================== -->
+
+    <div class="content-card">
+
+        <form method="POST">
+
+
+            <!-- =================================================
+                 NAME
+                 ================================================= -->
+
+            <div class="form-group">
+
+                <label for="name">
+                    Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Enter recipient name"
+                    value="{% if recipient %}{{ recipient['name'] }}{% endif %}"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- =================================================
+                 RELATIONSHIP
+                 ================================================= -->
+
+            <div class="form-group">
+
+                <label for="relationship">
+                    Relationship
+                </label>
+
+                <select
+                    id="relationship"
+                    name="relationship"
+                    required
+                >
+
+                    <option value="">
+                        Select relationship
+                    </option>
+
+
+                    {% set relationships = [
+
+                        "Friend",
+                        "Boyfriend",
+                        "Girlfriend",
+                        "Mother",
+                        "Father",
+                        "Brother",
+                        "Sister",
+                        "Family",
+                        "Colleague",
+                        "Other"
+
+                    ] %}
+
+
+                    {% for relationship in relationships %}
+
+                        <option
+                            value="{{ relationship }}"
+
+                            {% if recipient
+                                  and recipient["relationship"] == relationship %}
+
+                                selected
+
+                            {% endif %}
+                        >
+
+                            {{ relationship }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 AGE
+                 ================================================= -->
+
+            <div class="form-group">
+
+                <label for="age">
+                    Age
+                </label>
+
+                <input
+                    type="number"
+                    id="age"
+                    name="age"
+                    min="1"
+                    max="120"
+                    placeholder="Enter age"
+                    value="{% if recipient %}{{ recipient['age'] }}{% endif %}"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- =================================================
+                 INTEREST
+                 ================================================= -->
+
+            <div class="form-group">
+
+                <label for="interest">
+                    Interest / Hobby
+                </label>
+
+                <select
+                    id="interest"
+                    name="interest"
+                    required
+                >
+
+                    <option value="">
+                        Select interest / hobby
+                    </option>
+
+
+                    {% set interests = [
+
+                        "Sports",
+                        "Gaming",
+                        "Reading",
+                        "Gardening",
+                        "Cooking",
+                        "Dancing",
+                        "Music",
+                        "Art & Drawing",
+                        "Fashion",
+                        "Technology",
+                        "Photography",
+                        "Travelling",
+                        "Beauty & Self-care"
+
+                    ] %}
+
+
+                    {% for interest in interests %}
+
+                        <option
+                            value="{{ interest }}"
+
+                            {% if recipient
+                                  and recipient["interest"] == interest %}
+
+                                selected
+
+                            {% endif %}
+                        >
+
+                            {{ interest }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 BUDGET
+                 ================================================= -->
+
+            <div class="form-group">
+
+                <label for="budget">
+                    Budget
+                </label>
+
+
+                <div class="budget-input">
+
+                    <span>
+                        RM
+                    </span>
+
+
+                    <input
+                        type="number"
+                        id="budget"
+                        name="budget"
+                        min="10"
+                        max="1000"
+                        step="1"
+                        placeholder="100"
+
+                        value="{% if recipient %}{{ recipient['budget'] }}{% else %}{{ default_budget }}{% endif %}"
+
+                        required
+                    >
+
+                </div>
+
+
+                <small
+                    style="
+                        font-size: 10px;
+                        color: #81798c;
+                        margin-top: 2px;
+                    "
+                >
+                    Enter a budget between RM10 and RM1,000.
+                </small>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 FORM BUTTONS
+                 ================================================= -->
+
+            <div class="form-actions">
+
+                <a
+                    href="{{ url_for('recipients') }}"
+                    class="secondary-button"
+                >
+                    Cancel
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+
+                    {% if edit_mode %}
+
+                        Save Changes
+
+                    {% else %}
+
+                        Add Recipient
+
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

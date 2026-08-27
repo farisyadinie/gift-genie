@@ -1,0 +1,2046 @@
+{% extends "base.html" %}
+
+{% block title %}
+Gift Ideas - Gift Genie
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+
+    /* =====================================================
+       GIFT IDEA PAGE
+       ===================================================== */
+
+    .gift-ideas-page {
+        width: 100%;
+    }
+
+
+    /* =====================================================
+       RECENT INTEREST SECTION
+       ===================================================== */
+
+    .recent-interest-section {
+        background: white;
+
+        border-radius: 18px;
+
+        padding: 18px 20px;
+
+        margin-bottom: 17px;
+
+        box-shadow:
+            0 5px 18px rgba(87, 56, 130, 0.045);
+    }
+
+
+    .recent-interest-title {
+        font-size: 16px;
+
+        font-weight: 700;
+
+        color: #171326;
+
+        margin-bottom: 4px;
+    }
+
+
+    .recent-interest-subtitle {
+        font-size: 11px;
+
+        color: #81798c;
+
+        margin-bottom: 14px;
+    }
+
+
+    /* =====================================================
+       INTEREST LIST
+       ===================================================== */
+
+    .interest-list {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap: 10px;
+    }
+
+
+    .interest-item {
+        min-width: 0;
+    }
+
+
+    /* =====================================================
+       INTEREST CARD
+       ===================================================== */
+
+    .interest-card {
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        width: 100%;
+
+        padding: 11px 12px;
+
+        border: 1px solid #e8e1f2;
+
+        border-radius: 12px;
+
+        background: #faf8ff;
+
+        color: #302a3c;
+
+        text-align: left;
+
+        font-family: inherit;
+
+        cursor: pointer;
+
+        transition: 0.2s ease;
+
+        appearance: none;
+
+        -webkit-appearance: none;
+    }
+
+
+    .interest-card:hover {
+        background: #f2eaff;
+
+        border-color: #d8c5f4;
+
+        transform: translateY(-2px);
+    }
+
+
+    .interest-card.active {
+        background: #eadcff;
+
+        border-color: #cdb2ef;
+
+        color: #713ddd;
+    }
+
+
+    /* =====================================================
+       INTEREST ICON
+       ===================================================== */
+
+    .interest-icon {
+        width: 38px;
+
+        height: 38px;
+
+        border-radius: 11px;
+
+        background: #eadcff;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 17px;
+
+        flex-shrink: 0;
+    }
+
+
+    .interest-card.active .interest-icon {
+        background: #ffffff;
+    }
+
+
+    /* =====================================================
+       INTEREST INFO
+       ===================================================== */
+
+    .interest-info {
+        min-width: 0;
+
+        flex: 1;
+    }
+
+
+    .interest-name {
+        font-size: 12px;
+
+        font-weight: 700;
+
+        margin-bottom: 3px;
+
+        white-space: nowrap;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+    }
+
+
+    .interest-count {
+        font-size: 10px;
+
+        color: #81798c;
+    }
+
+
+    .interest-card.active .interest-count {
+        color: #7552a7;
+    }
+
+
+    /* =====================================================
+       EXPANDABLE RECIPIENT LIST
+       ===================================================== */
+
+    .interest-recipients {
+        display: none;
+
+        background: #faf8ff;
+
+        border: 1px solid #e8e1f2;
+
+        border-top: none;
+
+        border-radius: 0 0 12px 12px;
+
+        padding: 9px;
+
+        margin-top: -1px;
+    }
+
+
+    .interest-item.expanded .interest-recipients {
+        display: block;
+    }
+
+
+    /* =====================================================
+       INDIVIDUAL RECIPIENT
+       ===================================================== */
+
+    .interest-recipient {
+        display: flex;
+
+        align-items: center;
+
+        gap: 9px;
+
+        padding: 7px 8px;
+
+        border-radius: 9px;
+
+        background: white;
+
+        margin-bottom: 6px;
+
+        cursor: pointer;
+
+        transition: 0.2s ease;
+    }
+
+
+    .interest-recipient:last-child {
+        margin-bottom: 0;
+    }
+
+
+    .interest-recipient:hover {
+        background: #f2eaff;
+    }
+
+
+    .interest-recipient-icon {
+        width: 28px;
+
+        height: 28px;
+
+        border-radius: 8px;
+
+        background: #eee2ff;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 13px;
+
+        flex-shrink: 0;
+    }
+
+
+    .interest-recipient-info {
+        min-width: 0;
+
+        flex: 1;
+    }
+
+
+    .interest-recipient-name {
+        font-size: 11px;
+
+        font-weight: 700;
+
+        color: #302a3c;
+
+        line-height: 1.3;
+    }
+
+
+    .interest-recipient-budget {
+        font-size: 9px;
+
+        color: #81798c;
+
+        margin-top: 2px;
+    }
+
+
+    /* =====================================================
+       EMPTY RECIPIENT MESSAGE
+       ===================================================== */
+
+    .interest-no-recipient {
+        font-size: 10px;
+
+        color: #81798c;
+
+        padding: 5px;
+
+        text-align: center;
+    }
+
+
+    /* =====================================================
+       FILTER MESSAGE
+       ===================================================== */
+
+    .interest-message {
+        display: none;
+
+        margin-top: 12px;
+
+        padding: 9px 11px;
+
+        border-radius: 9px;
+
+        background: #f5efff;
+
+        color: #6d3dde;
+
+        font-size: 11px;
+
+        line-height: 1.4;
+    }
+
+
+    .interest-message.show {
+        display: block;
+    }
+
+
+    /* =====================================================
+       NO INTERESTS
+       ===================================================== */
+
+    .no-interests {
+        padding: 12px;
+
+        border-radius: 10px;
+
+        background: #faf8ff;
+
+        color: #81798c;
+
+        font-size: 11px;
+    }
+
+
+    /* =====================================================
+       GIFT CARDS
+       ===================================================== */
+
+    .gift-ideas-page .recipient-grid {
+        align-items: stretch;
+    }
+
+
+    .gift-ideas-page .recipient-card {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 14px;
+
+        position: relative;
+
+        min-height: 145px;
+    }
+
+
+    .gift-ideas-page .recipient-info {
+        flex: 1;
+
+        min-width: 0;
+
+        padding-right: 5px;
+
+        padding-bottom: 32px;
+    }
+
+
+    .gift-ideas-page .recipient-info h3 {
+        margin-bottom: 6px;
+
+        line-height: 1.2;
+    }
+
+
+    .gift-ideas-page .recipient-info p {
+        margin-bottom: 8px;
+
+        line-height: 1.35;
+    }
+
+
+    .gift-ideas-page .recipient-info span {
+        display: block;
+
+        margin-top: 5px;
+    }
+
+
+    /* =====================================================
+       GIFT ACTIONS
+       ===================================================== */
+
+    .gift-ideas-page .recipient-actions {
+        position: absolute;
+
+        right: 18px;
+
+        bottom: 18px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: flex-end;
+
+        gap: 12px;
+
+        white-space: nowrap;
+    }
+
+
+    .gift-ideas-page .recipient-actions .edit-button {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        white-space: nowrap;
+
+        text-decoration: none;
+
+        line-height: 1;
+
+        cursor: pointer;
+
+        background: none;
+
+        border: none;
+
+        padding: 0;
+
+        margin: 0;
+
+        font-family: inherit;
+
+        font-size: 11px;
+
+        color: #713ddd;
+
+        appearance: none;
+
+        -webkit-appearance: none;
+    }
+
+
+    .gift-ideas-page .recipient-actions .edit-button:hover {
+        text-decoration: underline;
+    }
+
+
+    /* =====================================================
+       SAVED BUTTON
+       ===================================================== */
+
+    .gift-ideas-page .recipient-actions .saved-button {
+        color: #6d3de5;
+
+        font-weight: 600;
+    }
+
+
+    .gift-ideas-page .recipient-actions .saved-button.saved {
+        color: #7b42e8;
+
+        font-weight: 700;
+    }
+
+
+    /* =====================================================
+       DELETE BUTTON
+       ===================================================== */
+
+    .gift-ideas-page .recipient-actions .delete-gift-trigger {
+        color: #c93562;
+    }
+
+
+    /* =====================================================
+       DELETE MODAL
+       ===================================================== */
+
+    .delete-modal-overlay {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        background: rgba(34, 24, 52, 0.28);
+
+        display: none;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 20px;
+
+        z-index: 5000;
+    }
+
+
+    .delete-modal-overlay.show {
+        display: flex;
+    }
+
+
+    .delete-modal {
+        width: 100%;
+
+        max-width: 370px;
+
+        background: #ffffff;
+
+        border-radius: 18px;
+
+        padding: 25px 23px 22px;
+
+        text-align: center;
+
+        border: 1px solid #eee9f8;
+
+        box-shadow:
+            0 18px 45px rgba(62, 38, 100, 0.18);
+
+        animation: deleteModalAppear 0.2s ease;
+    }
+
+
+    @keyframes deleteModalAppear {
+
+        from {
+            opacity: 0;
+
+            transform: translateY(8px) scale(0.97);
+        }
+
+        to {
+            opacity: 1;
+
+            transform: translateY(0) scale(1);
+        }
+
+    }
+
+
+    .delete-modal-icon {
+        width: 55px;
+
+        height: 55px;
+
+        margin: 0 auto 14px;
+
+        border-radius: 16px;
+
+        background: #fde8ed;
+
+        color: #c93562;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 24px;
+    }
+
+
+    .delete-modal h2 {
+        font-size: 19px;
+
+        color: #171326;
+
+        margin-bottom: 7px;
+    }
+
+
+    .delete-modal p {
+        font-size: 12px;
+
+        color: #777084;
+
+        line-height: 1.5;
+
+        margin-bottom: 20px;
+    }
+
+
+    .delete-modal-actions {
+        display: flex;
+
+        gap: 10px;
+    }
+
+
+    .delete-cancel-button,
+    .delete-confirm-button {
+        flex: 1;
+
+        min-height: 42px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        font-family: inherit;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition: 0.2s ease;
+
+        appearance: none;
+
+        -webkit-appearance: none;
+    }
+
+
+    .delete-cancel-button {
+        background: #f1edf8;
+
+        color: #5f586b;
+    }
+
+
+    .delete-cancel-button:hover {
+        background: #e6dfef;
+    }
+
+
+    .delete-confirm-button {
+        background: #e83d68;
+
+        color: #ffffff;
+    }
+
+
+    .delete-confirm-button:hover {
+        background: #d92f5b;
+
+        transform: translateY(-1px);
+    }
+
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 1100px) {
+
+        .interest-list {
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
+
+    }
+
+
+    @media (max-width: 900px) {
+
+        .gift-ideas-page .recipient-card {
+            min-height: 160px;
+        }
+
+
+        .gift-ideas-page .recipient-actions {
+            right: 16px;
+
+            bottom: 16px;
+
+            gap: 9px;
+        }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+        .recent-interest-section {
+            padding: 16px;
+        }
+
+
+        .interest-list {
+            grid-template-columns: 1fr;
+        }
+
+
+        .delete-modal {
+            max-width: 330px;
+
+            padding: 22px 19px 19px;
+        }
+
+    }
+
+</style>
+
+
+<div class="recipients-page gift-ideas-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Gift Ideas
+            </h1>
+
+            <p>
+                Find thoughtful gift ideas for your special people.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RECENT INTERESTS
+         ===================================================== -->
+
+    <div class="recent-interest-section">
+
+        <div class="recent-interest-title">
+            Your Recent Interests
+        </div>
+
+
+        <div class="recent-interest-subtitle">
+            Based on the interests of people you recently added.
+        </div>
+
+
+        {% if recent_interests %}
+
+            <div class="interest-list">
+
+
+                <!-- ALL INTERESTS -->
+
+                <div
+                    class="interest-item active-item"
+                    data-category="all"
+                >
+
+                    <button
+                        type="button"
+                        class="interest-card active"
+                        data-interest="all"
+                    >
+
+                        <div class="interest-icon">
+                            ✨
+                        </div>
+
+
+                        <div class="interest-info">
+
+                            <div class="interest-name">
+                                All Interests
+                            </div>
+
+                            <div class="interest-count">
+
+                                {{ recipients|length }}
+
+                                {% if recipients|length == 1 %}
+                                    recipient
+                                {% else %}
+                                    recipients
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </button>
+
+
+                    <div class="interest-recipients">
+
+                        {% for recipient in recipients %}
+
+                            <div
+                                class="interest-recipient"
+                                data-recipient-id="{{ recipient['id'] }}"
+                                data-recipient-interest="{{ recipient['interest'] }}"
+                            >
+
+                                <div class="interest-recipient-icon">
+                                    👤
+                                </div>
+
+
+                                <div class="interest-recipient-info">
+
+                                    <div class="interest-recipient-name">
+                                        {{ recipient['name'] }}
+                                    </div>
+
+
+                                    <div class="interest-recipient-budget">
+
+                                        {{ recipient['interest'] }}
+
+                                        ·
+
+                                        RM{{ "%.0f"|format(recipient['budget']) }}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="interest-no-recipient">
+                                No recipients yet.
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- RECENT INTEREST CATEGORIES -->
+
+                {% for interest in recent_interests %}
+
+                    <div
+                        class="interest-item"
+                        data-category="{{ interest['interest'] }}"
+                    >
+
+                        <button
+                            type="button"
+                            class="interest-card"
+                            data-interest="{{ interest['interest'] }}"
+                        >
+
+                            <div class="interest-icon">
+
+                                {% if interest['interest'] == "Sports" %}
+                                    ⚽
+
+                                {% elif interest['interest'] == "Gaming" %}
+                                    🎮
+
+                                {% elif interest['interest'] == "Reading" %}
+                                    📚
+
+                                {% elif interest['interest'] == "Gardening" %}
+                                    🌱
+
+                                {% elif interest['interest'] == "Cooking" %}
+                                    👨‍🍳
+
+                                {% elif interest['interest'] == "Dancing" %}
+                                    💃
+
+                                {% elif interest['interest'] == "Music" %}
+                                    🎵
+
+                                {% elif interest['interest'] == "Art & Drawing" %}
+                                    🎨
+
+                                {% elif interest['interest'] == "Fashion" %}
+                                    👗
+
+                                {% elif interest['interest'] == "Technology" %}
+                                    💻
+
+                                {% elif interest['interest'] == "Photography" %}
+                                    📷
+
+                                {% elif interest['interest'] == "Travelling" %}
+                                    ✈️
+
+                                {% elif interest['interest'] == "Beauty & Self-care" %}
+                                    🧴
+
+                                {% else %}
+                                    🎁
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="interest-info">
+
+                                <div class="interest-name">
+                                    {{ interest['interest'] }}
+                                </div>
+
+
+                                <div class="interest-count">
+
+                                    {{ interest['recipient_count'] }}
+
+                                    {% if interest['recipient_count'] == 1 %}
+                                        recipient
+                                    {% else %}
+                                        recipients
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </button>
+
+
+                        <div class="interest-recipients">
+
+                            {% for recipient in recipients %}
+
+                                {% if recipient['interest'] == interest['interest'] %}
+
+                                    <div
+                                        class="interest-recipient"
+                                        data-recipient-id="{{ recipient['id'] }}"
+                                        data-recipient-interest="{{ recipient['interest'] }}"
+                                    >
+
+                                        <div class="interest-recipient-icon">
+                                            👤
+                                        </div>
+
+
+                                        <div class="interest-recipient-info">
+
+                                            <div class="interest-recipient-name">
+                                                {{ recipient['name'] }}
+                                            </div>
+
+
+                                            <div class="interest-recipient-budget">
+                                                RM{{ "%.0f"|format(recipient['budget']) }}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                {% endif %}
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+
+            </div>
+
+
+            <div
+                class="interest-message show"
+                id="interestMessage"
+            >
+                Showing all recipients.
+            </div>
+
+
+        {% else %}
+
+            <div class="no-interests">
+                Add some recipients to see their recent interests here.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+
+    <!-- =====================================================
+         GENERATE GIFT IDEAS
+         ===================================================== -->
+
+    <div class="content-card">
+
+        <form
+            method="POST"
+            action="{{ url_for('gift_ideas') }}"
+        >
+
+            <div class="form-group">
+
+                <label for="recipient_id">
+                    Who are you buying a gift for?
+                </label>
+
+
+                <select
+                    id="recipient_id"
+                    name="recipient_id"
+                    required
+                >
+
+                    <option value="">
+                        Select a recipient
+                    </option>
+
+
+                    {% for recipient in recipients %}
+
+                        <option
+                            value="{{ recipient['id'] }}"
+                            data-interest="{{ recipient['interest'] }}"
+                            data-name="{{ recipient['name'] }}"
+                            data-budget="{{ recipient['budget'] }}"
+
+                            {% if selected_recipient
+                                  and selected_recipient['id'] == recipient['id'] %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {{ recipient['name'] }}
+
+                            —
+
+                            {{ recipient['interest'] }}
+
+                            —
+
+                            RM{{ "%.0f"|format(recipient['budget']) }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <a
+                    href="{{ url_for('recipients') }}"
+                    class="secondary-button"
+                >
+                    Manage Recipients
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    ✨ Generate Gift Ideas
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SELECTED RECIPIENT
+         ===================================================== -->
+
+    {% if selected_recipient %}
+
+        <div class="gift-recipient-info">
+
+            <h2>
+                Gift ideas for {{ selected_recipient['name'] }}
+            </h2>
+
+
+            <p>
+
+                Based on their interest in
+
+                <strong>
+                    {{ selected_recipient['interest'] }}
+                </strong>
+
+                and a budget of
+
+                <strong>
+                    RM{{ "%.0f"|format(selected_recipient['budget']) }}
+                </strong>.
+
+            </p>
+
+        </div>
+
+    {% endif %}
+
+
+
+    <!-- =====================================================
+         GIFT IDEAS
+         ===================================================== -->
+
+    {% if gifts %}
+
+        <div class="recipient-grid">
+
+            {% for gift in gifts %}
+
+                <div
+                    class="recipient-card"
+                    data-gift-id="{{ gift['id'] }}"
+                >
+
+                    <div class="recipient-avatar">
+                        🎁
+                    </div>
+
+
+                    <div class="recipient-info">
+
+                        <h3>
+                            {{ gift['name'] }}
+                        </h3>
+
+
+                        <p>
+                            {{ gift['description'] }}
+                        </p>
+
+
+                        <span>
+
+                            RM{{ "%.0f"|format(gift['min_price']) }}
+
+                            -
+
+                            RM{{ "%.0f"|format(gift['max_price']) }}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="recipient-actions">
+
+
+                        <!-- SAVE -->
+
+                        <a
+                            href="{{ url_for(
+                                'save_gift',
+                                gift_id=gift['id']
+                            ) }}"
+                            class="edit-button saved-button"
+                            data-save-gift="{{ gift['id'] }}"
+                        >
+                            ♡ Save
+                        </a>
+
+
+                        <!-- EDIT -->
+
+                        <a
+                            href="{{ url_for(
+                                'edit_gift',
+                                gift_id=gift['id']
+                            ) }}"
+                            class="edit-button"
+                        >
+                            Edit
+                        </a>
+
+
+                        <!-- DELETE -->
+
+                        <button
+                            type="button"
+                            class="edit-button delete-gift-trigger"
+                            data-gift-id="{{ gift['id'] }}"
+                            data-gift-name="{{ gift['name'] }}"
+                        >
+                            Delete
+                        </button>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+    {% elif selected_recipient %}
+
+        <div class="recipients-empty">
+
+            <div class="empty-recipient-icon">
+                🎁
+            </div>
+
+
+            <h2>
+                No gift ideas yet
+            </h2>
+
+
+            <p>
+                Click "Generate Gift Ideas" to find suggestions
+                based on {{ selected_recipient['name'] }}'s interests
+                and budget.
+            </p>
+
+
+            <form
+                method="POST"
+                action="{{ url_for('gift_ideas') }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="recipient_id"
+                    value="{{ selected_recipient['id'] }}"
+                >
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    ✨ Generate Gift Ideas
+                </button>
+
+            </form>
+
+        </div>
+
+
+    {% elif not recipients %}
+
+        <div class="recipients-empty">
+
+            <div class="empty-recipient-icon">
+                👥
+            </div>
+
+
+            <h2>
+                Add a recipient first
+            </h2>
+
+
+            <p>
+                Gift Genie needs information about the person
+                before it can recommend gifts.
+            </p>
+
+
+            <a
+                href="{{ url_for('recipient_form') }}"
+                class="primary-button"
+            >
+                + Add Recipient
+            </a>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="recipients-empty">
+
+            <div class="empty-recipient-icon">
+                🎁
+            </div>
+
+
+            <h2>
+                Ready to find a gift?
+            </h2>
+
+
+            <p>
+                Click an interest above to see the recipients,
+                then choose a recipient and generate personalised suggestions.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+
+</div>
+
+
+
+<!-- =========================================================
+     DELETE GIFT MODAL
+     ========================================================= -->
+
+<div
+    class="delete-modal-overlay"
+    id="deleteModalOverlay"
+>
+
+    <div
+        class="delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="deleteModalTitle"
+    >
+
+        <div class="delete-modal-icon">
+            🗑️
+        </div>
+
+
+        <h2 id="deleteModalTitle">
+            Delete Gift Idea?
+        </h2>
+
+
+        <p id="deleteModalMessage">
+            Are you sure you want to delete this gift idea?
+            This action cannot be undone.
+        </p>
+
+
+        <div class="delete-modal-actions">
+
+            <button
+                type="button"
+                class="delete-cancel-button"
+                id="deleteCancelButton"
+            >
+                Cancel
+            </button>
+
+
+            <button
+                type="button"
+                class="delete-confirm-button"
+                id="deleteConfirmButton"
+            >
+                Delete
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    /* =====================================================
+       INTEREST INTERACTION
+       ===================================================== */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const interestItems =
+                document.querySelectorAll(
+                    ".interest-item"
+                );
+
+
+            const recipientSelect =
+                document.getElementById(
+                    "recipient_id"
+                );
+
+
+            const interestMessage =
+                document.getElementById(
+                    "interestMessage"
+                );
+
+
+            if (
+                !recipientSelect ||
+                interestItems.length === 0
+            ) {
+
+                return;
+
+            }
+
+
+            const originalOptions =
+                Array.from(
+                    recipientSelect.options
+                );
+
+
+            function setActiveCategory(
+                selectedInterest
+            ) {
+
+                interestItems.forEach(
+                    function (item) {
+
+                        const card =
+                            item.querySelector(
+                                ".interest-card"
+                            );
+
+
+                        if (!card) {
+
+                            return;
+
+                        }
+
+
+                        const category =
+                            card.getAttribute(
+                                "data-interest"
+                            );
+
+
+                        if (
+                            category === selectedInterest
+                        ) {
+
+                            card.classList.add(
+                                "active"
+                            );
+
+                        }
+
+                        else {
+
+                            card.classList.remove(
+                                "active"
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            function filterRecipients(
+                selectedInterest
+            ) {
+
+                recipientSelect.innerHTML = "";
+
+
+                const placeholder =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                placeholder.value = "";
+
+                placeholder.textContent =
+                    "Select a recipient";
+
+
+                recipientSelect.appendChild(
+                    placeholder
+                );
+
+
+                let count = 0;
+
+
+                originalOptions.forEach(
+                    function (option) {
+
+                        if (!option.value) {
+
+                            return;
+
+                        }
+
+
+                        const interest =
+                            option.getAttribute(
+                                "data-interest"
+                            );
+
+
+                        if (
+                            selectedInterest === "all" ||
+                            interest === selectedInterest
+                        ) {
+
+                            recipientSelect.appendChild(
+                                option
+                            );
+
+                            count++;
+
+                        }
+
+                    }
+                );
+
+
+                recipientSelect.value = "";
+
+
+                if (!interestMessage) {
+
+                    return;
+
+                }
+
+
+                if (
+                    selectedInterest === "all"
+                ) {
+
+                    interestMessage.textContent =
+                        `Showing all ${count} recipient${count === 1 ? "" : "s"}.`;
+
+                }
+
+                else {
+
+                    interestMessage.textContent =
+                        `${count} recipient${count === 1 ? "" : "s"} found in ${selectedInterest}.`;
+
+                }
+
+
+                interestMessage.classList.add(
+                    "show"
+                );
+
+            }
+
+
+            function closeAllItems() {
+
+                interestItems.forEach(
+                    function (item) {
+
+                        item.classList.remove(
+                            "expanded"
+                        );
+
+                    }
+                );
+
+            }
+
+
+            interestItems.forEach(
+                function (item) {
+
+                    const card =
+                        item.querySelector(
+                            ".interest-card"
+                        );
+
+
+                    if (!card) {
+
+                        return;
+
+                    }
+
+
+                    card.addEventListener(
+                        "click",
+                        function () {
+
+                            const selectedInterest =
+                                card.getAttribute(
+                                    "data-interest"
+                                );
+
+
+                            const alreadyExpanded =
+                                item.classList.contains(
+                                    "expanded"
+                                );
+
+
+                            closeAllItems();
+
+
+                            setActiveCategory(
+                                selectedInterest
+                            );
+
+
+                            filterRecipients(
+                                selectedInterest
+                            );
+
+
+                            if (!alreadyExpanded) {
+
+                                item.classList.add(
+                                    "expanded"
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+
+            const recipientButtons =
+                document.querySelectorAll(
+                    ".interest-recipient"
+                );
+
+
+            recipientButtons.forEach(
+                function (recipientButton) {
+
+                    recipientButton.addEventListener(
+                        "click",
+                        function () {
+
+                            const recipientId =
+                                recipientButton.getAttribute(
+                                    "data-recipient-id"
+                                );
+
+
+                            recipientSelect.innerHTML =
+                                "";
+
+
+                            originalOptions.forEach(
+                                function (option) {
+
+                                    recipientSelect.appendChild(
+                                        option
+                                    );
+
+                                }
+                            );
+
+
+                            recipientSelect.value =
+                                recipientId;
+
+
+                            const selectedOption =
+                                recipientSelect.options[
+                                    recipientSelect.selectedIndex
+                                ];
+
+
+                            if (!selectedOption) {
+
+                                return;
+
+                            }
+
+
+                            const interest =
+                                selectedOption.getAttribute(
+                                    "data-interest"
+                                );
+
+
+                            setActiveCategory(
+                                interest
+                            );
+
+
+                            if (interestMessage) {
+
+                                interestMessage.textContent =
+                                    `${selectedOption.getAttribute("data-name")} selected.`;
+
+                                interestMessage.classList.add(
+                                    "show"
+                                );
+
+                            }
+
+
+                            recipientSelect.scrollIntoView({
+
+                                behavior: "smooth",
+
+                                block: "center"
+
+                            });
+
+                        }
+                    );
+
+                }
+            );
+
+
+            recipientSelect.addEventListener(
+                "change",
+                function () {
+
+                    const selectedOption =
+                        recipientSelect.options[
+                            recipientSelect.selectedIndex
+                        ];
+
+
+                    if (
+                        !selectedOption ||
+                        !selectedOption.value
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const selectedInterest =
+                        selectedOption.getAttribute(
+                            "data-interest"
+                        );
+
+
+                    setActiveCategory(
+                        selectedInterest
+                    );
+
+
+                    if (interestMessage) {
+
+                        interestMessage.textContent =
+                            `${selectedOption.getAttribute("data-name")} selected.`;
+
+                        interestMessage.classList.add(
+                            "show"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+
+    /* =====================================================
+       SAVED GIFT VISUAL FEEDBACK
+       ===================================================== */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const saveButtons =
+                document.querySelectorAll(
+                    "[data-save-gift]"
+                );
+
+
+            saveButtons.forEach(
+                function (button) {
+
+                    const giftId =
+                        button.getAttribute(
+                            "data-save-gift"
+                        );
+
+
+                    const savedKey =
+                        "gift_genie_saved_" + giftId;
+
+
+                    if (
+                        localStorage.getItem(
+                            savedKey
+                        ) === "true"
+                    ) {
+
+                        button.innerHTML =
+                            "♥ Saved";
+
+                        button.classList.add(
+                            "saved"
+                        );
+
+                    }
+
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            localStorage.setItem(
+                                savedKey,
+                                "true"
+                            );
+
+
+                            button.innerHTML =
+                                "♥ Saved";
+
+                            button.classList.add(
+                                "saved"
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+
+    /* =====================================================
+       DELETE GIFT MODAL
+       ===================================================== */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const deleteModalOverlay =
+                document.getElementById(
+                    "deleteModalOverlay"
+                );
+
+
+            const deleteModalMessage =
+                document.getElementById(
+                    "deleteModalMessage"
+                );
+
+
+            const deleteCancelButton =
+                document.getElementById(
+                    "deleteCancelButton"
+                );
+
+
+            const deleteConfirmButton =
+                document.getElementById(
+                    "deleteConfirmButton"
+                );
+
+
+            const deleteTriggers =
+                document.querySelectorAll(
+                    ".delete-gift-trigger"
+                );
+
+
+            let selectedGiftId = null;
+
+
+            deleteTriggers.forEach(
+                function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            selectedGiftId =
+                                button.dataset.giftId;
+
+
+                            const giftName =
+                                button.dataset.giftName;
+
+
+                            deleteModalMessage.textContent =
+                                `Are you sure you want to delete "${giftName}"? This action cannot be undone.`;
+
+
+                            deleteModalOverlay.classList.add(
+                                "show"
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+            function closeDeleteModal() {
+
+                deleteModalOverlay.classList.remove(
+                    "show"
+                );
+
+
+                selectedGiftId = null;
+
+            }
+
+
+            if (deleteCancelButton) {
+
+                deleteCancelButton.addEventListener(
+                    "click",
+                    function () {
+
+                        closeDeleteModal();
+
+                    }
+                );
+
+            }
+
+
+            if (deleteConfirmButton) {
+
+                deleteConfirmButton.addEventListener(
+                    "click",
+                    function () {
+
+                        if (!selectedGiftId) {
+
+                            return;
+
+                        }
+
+
+                        window.location.href =
+                            `/gift-ideas/delete/${selectedGiftId}`;
+
+                    }
+                );
+
+            }
+
+
+            if (deleteModalOverlay) {
+
+                deleteModalOverlay.addEventListener(
+                    "click",
+                    function (event) {
+
+                        if (
+                            event.target ===
+                            deleteModalOverlay
+                        ) {
+
+                            closeDeleteModal();
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            document.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key === "Escape" &&
+                        deleteModalOverlay.classList.contains(
+                            "show"
+                        )
+                    ) {
+
+                        closeDeleteModal();
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+</script>
+
+
+{% endblock %}
